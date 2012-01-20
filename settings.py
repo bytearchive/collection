@@ -164,6 +164,9 @@ INSTALLED_APPS = [
     
     # project
     "about",
+
+    # my project 
+    "reader",
 ]
 
 FIXTURE_DIRS = [

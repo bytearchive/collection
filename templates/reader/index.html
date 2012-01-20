@@ -1,0 +1,19 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+{% load ifsetting_tag %}
+
+{% block head_title %}{% trans "What Next?" %}{% endblock %}
+
+{% block body %}
+    <h1>{% trans "What Next?" %}</h1>
+
+    {% if user.is_authenticated %}
+    <form action="/reader/create/" method="post">
+        {% csrf_token %}
+        <input type="text" name="article_url" value="" />
+        <input class="btn" type="submit" value="Create" />
+    </form>
+    {% endif %}
+{% endblock %}
+
