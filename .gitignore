@@ -1,0 +1,12 @@
+# .gitignore file for Django
+
+*.log
+*.pot
+*.pyc
+local_settings.py
+
+# development db file
+dev.db
+
+# Mac OS realted file
+.DS_Store
