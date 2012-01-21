@@ -5,6 +5,9 @@
 *.pyc
 local_settings.py
 
+# vim swap file
+*.swp
+
 # development db file
 dev.db
 

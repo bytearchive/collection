@@ -1,5 +1,5 @@
 import urllib2 
-from models import Article
+from models import Article, Subscription
 from django.shortcuts import render_to_response, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -14,12 +14,15 @@ def create(request):
     page = pq(urllib2.urlopen(article_url).read())
     content = page('.entry-content')
 
-    article = Article()
-    article.site_url = urllib2.Request(article_url).get_host()
-    article.article_url = article_url
-    article.title = page('h1').text()
-    article.content = content
-    article.owner = request.user
-    article.save()
+    site_url = urllib2.Request(article_url).get_host()
+    title = page('h1').text()
+    article = Article.objects.create(site_url = site_url,
+            article_url = article_url,
+            title = title,
+            content = content)
 
+    user = request.user
+    print user, user.get_profile()
+    Subscription.objects.create(user_profile = user.get_profile(), 
+            article = article)
     return HttpResponseRedirect(reverse('reader.views.detail', args=(article.id, )))
