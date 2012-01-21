@@ -43,10 +43,8 @@
     <div class="page-header">
         <h1>{{ article.title }}<small>{{ article.site_url }}</small></h1>
     </div>
-    <div class="row">
-        <div class="span14">
-            {{ article.content|safe }}
-        </div>
+    <div class="span14">
+        {{ article.content|safe }}
     </div>
 </div>
 {% endblock %}

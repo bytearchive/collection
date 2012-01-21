@@ -5,6 +5,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from pyquery import PyQuery as pq
 
+def index(request):
+    articles = list(Article.objects.all()[:50])
+    return render(request, 'reader/index.html', {'articles': articles})
+    
+
 def detail(request, article_id):
     article = Article.objects.get(pk=article_id)
     return render(request, 'reader/detail.html', {'article': article})

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+from pyquery import PyQuery as pq
 
 class DateSupportModel(models.Model):
     updated = models.DateTimeField('date upated', auto_now=True, auto_now_add=True)
@@ -17,6 +18,11 @@ class Article(DateSupportModel):
 
     def __unicode__(self):
         return self.title
+
+    def _get_summary(self):
+        content = pq(self.content)
+        return content.text()[:100] + "..."
+    summary = property(_get_summary)
 
 class UserProfile(DateSupportModel):
     user = models.OneToOneField(User)
