@@ -4,7 +4,9 @@ from django.contrib.auth.models import User
 
 class Article(models.Model):
     site_url = models.CharField(max_length=200)
+    
     article_url = models.CharField(max_length=200)
+    title = models.CharField(max_length=200)
     content = models.TextField()
 
     owner = models.ForeignKey(User)
