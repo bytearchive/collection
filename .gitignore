@@ -8,8 +8,9 @@ local_settings.py
 # vim swap file
 *.swp
 
-# development db file
+# database
 dev.db
+fixtures/initial_data.json
 
 # Mac OS realted file
 .DS_Store
