@@ -16,7 +16,7 @@ PATTERNS = {
     "BLOCK_ELEMENT": r"<(a|blockquote|dl|div|img|ol|p|pre|table|ul)",
     "REPLACE_BR": r"(<br[^>]*>[ \n\r\t]*){2,}",
     "REPLACE_FONT": r"<(\/?)font[^>]*>",
-    "TRIM": r"^\s+|\s+$",
+    "TRIM": r"^(\s|&nbsp;)+|(\s|&nbsp;)+$",
     "NORMALIZE": r"\s{2,}",
     "REMOVE_DUP_BREAKS": r"(<br\s*\/?>(\s|&nbsp;?)*){1,}",
     "VIDEO_URL": r"http:\/\/(www\.)?(youtube|vimeo)\.com"
@@ -190,8 +190,12 @@ class ArticleCleaner(object):
     def _remove_empty_paragraph(self):
         elems = self.article.findAll('p')
         for p in elems:
+            print "===="
+            print p.prettify()
             img_embded_obj_count = len(p.findAll(['img', 'embed', 'object']))
-            if img_embded_obj_count == 0 and len(_inner_text(p)) == 0:
+            text = ArticleCleaner._trim_spaces(_inner_text(p))
+            if img_embded_obj_count == 0 and len(text) == 0:
+                print "=== remove empty paragrapy"
                 p.extract()
 
     def clean(self):

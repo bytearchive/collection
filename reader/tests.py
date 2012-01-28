@@ -101,11 +101,12 @@ class ArticleCleanerTest(TestCase):
         self.assertEqual(0, len(self.body.findAll('p')))
 
     def test_remove_empty_p(self):
-        self.soup = Soup('<p></p>')
+        self.soup = Soup('<p> &nbsp; </p>')
         self.assertEqual(1, len(self.soup.findAll('p')))
         ac = ArticleCleaner(self.soup)
         ac._remove_empty_paragraph()
         self.assertEqual(0, len(self.soup.findAll('p')))
+
 
 class ArticleExtractorTest(TestCase):
     
