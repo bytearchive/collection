@@ -19,7 +19,8 @@ PATTERNS = {
     "TRIM": r"^(\s|&nbsp;)+|(\s|&nbsp;)+$",
     "NORMALIZE": r"[ \t]{2,}",
     "REMOVE_DUP_BREAKS": r"(<br\s*\/?>(\s|&nbsp;?)*){1,}",
-    "VIDEO_URL": r"http:\/\/(www\.)?(youtube|vimeo)\.com"
+    "VIDEO_URL": r"http:\/\/(www\.)?(youtube|vimeo)\.com",
+    "AUTHOR_CANDIDATE": r"author",
 }
 
 def _debug(*argv):
@@ -200,7 +201,7 @@ class ArticleCleaner(object):
         self._remove_attribute()
 
         html = ArticleCleaner._remove_dup_breaks(self.article.__str__())
-        html = ArticleCleaner._remove_dup_spaces(html)
+        #html = ArticleCleaner._remove_dup_spaces(html)
         html = ArticleCleaner._trim_spaces(html)
 
         self.article = Soup(html)
@@ -225,6 +226,7 @@ class ArticleExtractor(object):
         self.html = html
         self.doc = Soup(html)
         self.candidates = None
+        self.article = None
         self.top_candidate = None
       
     @staticmethod
@@ -360,13 +362,57 @@ class ArticleStyler(object):
             self.add_css_class(name, cls)
         return self.article
         
+class ArticleMetaExtractor(object):
+    
+    def __init__(self, html):
+        super(ArticleMetaExtractor, self).__init__()
+        self.html = html
+        self.doc = Soup(html)
+        self.author_re = re.compile(PATTERNS["AUTHOR_CANDIDATE"])
 
+    def get_author(self):
+        elems = self.doc.findAll(attrs={'class': self.author_re})
+        author = ''
+        for elem in elems:
+            author = _inner_text(elem.find('a'))
+            break
+        _debug('author:', author)
+        return author
 
-def extract(file_path = "two.html"):
+    def get_published(self):
+        elems = self.doc.findAll(attrs={'class': 'published'})
+        pub = ''
+        for elem in elems:
+            pub = _inner_text(elem)
+            break
+        _debug('published:', pub)
+        return pub
+
+    def get_title(self):
+        title = self.doc.find('h1')
+        h2s = self.doc.findAll('h2')
+
+        if title is None and len(h2s) == 1:
+            title = h2s[0]
+        if title is None:
+            return '';
+        text = _inner_text(title)
+        text = ArticleCleaner._remove_dup_spaces(text)
+        text = ArticleCleaner._trim_spaces(text)
+        _debug('title:', text)
+        return text
+
+def extract(file_path = "author.html"):
     with open(file_path, "r") as file:
         html = ''.join(file.readlines())
-    get_article(html)
-    get_title(html)
+    print get_article_meta(html)
+
+def get_article_meta(html):
+    meta = ArticleMetaExtractor(html)
+    title = meta.get_title()
+    author = meta.get_author()
+    published = meta.get_published()
+    return title, author, published 
 
 def get_article(html):
     article = ArticleExtractor(html).extract()
@@ -374,18 +420,6 @@ def get_article(html):
     article = ArticleStyler(article).style()
     return article.__str__()
 
-def get_title(html):
-    soup = Soup(html)
-    title = soup.find('h1')
-
-    if title is None:
-        return ''
-   
-    text = _inner_text(title)
-    text = ArticleCleaner._remove_dup_spaces(text)
-    text = ArticleCleaner._trim_spaces(text)
-    _debug('title:', text)
-    return text
 
 if __name__ == '__main__':
     extract()

@@ -3,7 +3,7 @@ from models import Article, Subscription
 from django.shortcuts import render_to_response, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from extractor import get_article, get_title
+from extractor import get_article, get_article_meta
 
 def browse(request, sub_state):
     reading_cnt = Subscription.objects.filter(subscription_state='UNREAD').count()
@@ -32,16 +32,18 @@ def subscribe(request):
 
     site_url = urllib2.Request(article_url).get_host()
     content = get_article(html)
-    title = get_title(html)
+    title, author, published = get_article_meta(html)
     article = Article.objects.create(site_url = site_url,
             article_url = article_url,
             title = title,
+            author = author,
+            published = published,
             content = content)
 
     user = request.user
     Subscription.objects.create(user_profile = user.get_profile(), 
             article = article)
-    return HttpResponseRedirect(reverse('reader:detail', args=(article.id, )))
+    return HttpResponseRedirect(reverse('reader:article_detail', args=(article.id, )))
 
 def unsubscribe(request, sub_id):
     pass

@@ -15,6 +15,8 @@ class Article(DateSupportModel):
     site_url = models.CharField(max_length=200)
     article_url = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
+    author = models.CharField(max_length=50)
+    published = models.CharField(max_length=50)
     content = models.TextField()
 
     def __unicode__(self):
