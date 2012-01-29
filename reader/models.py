@@ -21,9 +21,7 @@ class Article(DateSupportModel):
         return self.title
 
     def _get_summary(self): 
-        print "========="
         text = _inner_text(Soup(self.content))
-        print len(text)
         return text[:150] + "..."
     summary = property(_get_summary)
 

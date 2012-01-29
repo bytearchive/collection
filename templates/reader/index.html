@@ -69,9 +69,9 @@
         {% if user.is_authenticated %}
         <ul class="pills">
             <li class="{{reading_class}}"><a href="/reader">Reading ({{unread_count}})</a></li>
-            <li class="{{achieve_class}}"><a href="achieve/">Achieve</a></li>
+            <li class="{{achieve_class}}"><a href="{% url reader:view_achieve %}">Achieve</a></li>
         </ul> 
-        <form action="/reader/create/" method="post">
+        <form action="{% url reader:subscribe %}" method="post">
             {% csrf_token %}
             <div class="input-prepend">
                 <input class="span6" id="prependedInput" name="article_url" size="16" type="text"
@@ -91,19 +91,19 @@
               <td>
                   <div class="article-item-container">
                       <div class="article-item">
-                          <h3><a href="{{a.article_url}}"><img src="//s2.googleusercontent.com/s2/favicons?domain={{a.site_url}}" title="view original from {{a.site_url}}"></img></a>
-                              <a href="/reader/{{a.id}}">{{a.title}}</a> </h3>
+                          <h3><a href="{{ a.article_url }}"><img src="//s2.googleusercontent.com/s2/favicons?domain={{a.site_url}}" title="view original from {{a.site_url}}"></img></a>
+                              <a href="{% url reader:article_detail a.id %}">{{a.title}}</a> </h3>
                           <p>{{a.summary}}</p>
                        </div>
                        <div class="article-actions-container">
                            <ul class="article-actions-list">
                                {% if achieve_class  %}
-                               <li> <a href="/reader/unread/{{sub.id}}" class="small">Unread</a> </li>
+                               <li> <a href="{% url reader:unread sub.id  %}" class="small">Unread</a> </li>
                                {% endif %}
                                {% if reading_class  %}
-                               <li> <a href="/reader/mark-as-read/{{sub.id}}" class="small">Achieve</a> </li>
+                               <li> <a href="{% url reader:mark_as_read sub.id %}" class="small">Achieve</a> </li>
                                {% endif %}
-                               <li> <a href="/reader/delete/{{sub.id}}" class="small">Delete</a> </li>
+                               <li> <a href="{% url reader:unsubscribe %}" class="small">Delete</a> </li>
                            </ul>
                        </div>
                   </div>

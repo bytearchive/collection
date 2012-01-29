@@ -15,7 +15,6 @@ def browse(request, sub_state):
         'reading_class': reading_class, \
         'achieve_class': achieve_class
     })
-    pass
 
 def index(request):
     return browse(request, 'UNREAD')
@@ -27,7 +26,7 @@ def detail(request, article_id):
     article = Article.objects.get(pk=article_id)
     return render(request, 'reader/detail.html', {'article': article})
 
-def create(request):
+def subscribe(request):
     article_url = request.POST['article_url']
     html = urllib2.urlopen(article_url).read()
 
@@ -42,10 +41,20 @@ def create(request):
     user = request.user
     Subscription.objects.create(user_profile = user.get_profile(), 
             article = article)
-    return HttpResponseRedirect(reverse('reader.views.detail', args=(article.id, )))
+    return HttpResponseRedirect(reverse('reader:detail', args=(article.id, )))
+
+def unsubscribe(request, sub_id):
+    pass
+
+def _change_subscription_state(sub_id, change_to='UNREAD'):
+    sub = Subscription.objects.get(pk=sub_id)
+    sub.subscription_state = change_to
+    sub.save()
 
 def mark_as_read(request, sub_id):
-    sub = Subscription.objects.get(pk=sub_id)
-    sub.subscription_state = 'ACHIEVE'
-    sub.save()
-    return HttpResponseRedirect(reverse('reader.views.index'))
+    _change_subscription_state(sub_id, 'ACHIEVE')
+    return HttpResponseRedirect(reverse('reader:index'))
+
+def unread(request, sub_id):
+    _change_subscription_state(sub_id, 'UNREAD')
+    return HttpResponseRedirect(reverse('reader:view_achieve'))
