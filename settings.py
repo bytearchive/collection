@@ -166,6 +166,9 @@ INSTALLED_APPS = [
     # project
     "about",
 
+    # my external
+    "taggit",
+
     # my project 
     "reader",
 ]

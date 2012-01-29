@@ -22,9 +22,14 @@ def index(request):
 def achieve(request):
     return browse(request, 'ACHIEVE')
     
-def detail(request, article_id):
-    article = Article.objects.get(pk=article_id)
-    return render(request, 'reader/detail.html', {'article': article})
+def detail(request, sub_id):
+    sub = Subscription.objects.get(pk=sub_id)
+    article = sub.article
+    return render(request, 'reader/detail.html', {
+        'article': article, 
+        'subscription': sub,
+        'tags': sub.tags.all()
+    })
 
 def subscribe(request):
     article_url = request.POST['article_url']
@@ -60,3 +65,19 @@ def mark_as_read(request, sub_id):
 def unread(request, sub_id):
     _change_subscription_state(sub_id, 'UNREAD')
     return HttpResponseRedirect(reverse('reader:view_achieve'))
+
+def _tag_changed(request):
+    tag = request.POST['tag_name']
+    sub_id = int(request.POST['sub_id'])
+    sub = Subscription.objects.get(pk=sub_id)
+    return sub, tag
+
+def add_tag(request):
+    sub, tag = _tag_changed(request)
+    sub.tags.add(tag);
+    return HttpResponse('success')
+
+def remove_tag(request):
+    sub, tag = _tag_changed(request)
+    sub.tags.remove(tag);
+    return HttpResponse('success')

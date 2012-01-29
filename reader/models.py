@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from extractor import _inner_text
 from BeautifulSoup import BeautifulSoup as Soup
+from taggit.managers import TaggableManager
 
 class DateSupportModel(models.Model):
     updated = models.DateTimeField('date upated', auto_now=True, auto_now_add=True)
@@ -34,6 +35,7 @@ class UserProfile(DateSupportModel):
     def __unicode__(self):
         return self.user.username
 
+
 class Subscription(DateSupportModel):
     SUBSCRIPTION_STATE = (
         (u'UNREAD', u'unread'),
@@ -42,6 +44,7 @@ class Subscription(DateSupportModel):
     user_profile = models.ForeignKey(UserProfile)
     article = models.ForeignKey(Article)
     subscription_state = models.CharField(max_length=20, choices=SUBSCRIPTION_STATE, default="UNREAD") 
+    tags = TaggableManager()
 
     def __unicode__(self):
         return "%s's article: %s" % (self.user_profile.user, self.article.title)
