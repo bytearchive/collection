@@ -5,6 +5,16 @@
 
 {% block head_title_base %}{{article.title}}{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/prettify.css">
+<script src="{{ STATIC_URL }}js/prettify.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() { 
+    prettyPrint();
+});
+</script>
+{% endblock %}
+
 {% block topbar_base %} {% endblock %}
 
 {% block body %}
@@ -58,6 +68,10 @@
     #article-content li {
         font-size: 1.3em;
         line-height: 150%;
+    }
+
+    code {
+        background: transparent;    
     }
 </style>
 <div class="wrapper">

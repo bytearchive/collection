@@ -342,6 +342,24 @@ class ArticleExtractor(object):
             self.merge_related_elems()
         return self.article
 
+class ArticleStyler(object):
+    """put css class to elems"""
+    def __init__(self, article):
+        super(ArticleStyler, self).__init__()
+        self.article = article
+
+    def add_css_class(self, name, cls):
+        elems = self.article.findAll(name)
+        for elem in elems:
+            css_cls = _attr(elem, 'class').strip() + " " + cls
+            elem['class'] = css_cls
+
+    def style(self):
+        styles = (('pre', 'prettyprint'), ('code', 'prettyprint'))
+        for name, cls in styles:
+            self.add_css_class(name, cls)
+        return self.article
+        
 
 
 def extract(file_path = "two.html"):
@@ -353,6 +371,7 @@ def extract(file_path = "two.html"):
 def get_article(html):
     article = ArticleExtractor(html).extract()
     article = ArticleCleaner(article).clean()
+    article = ArticleStyler(article).style()
     return article.__str__()
 
 def get_title(html):
