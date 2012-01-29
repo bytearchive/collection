@@ -17,7 +17,7 @@ PATTERNS = {
     "REPLACE_BR": r"(<br[^>]*>[ \n\r\t]*){2,}",
     "REPLACE_FONT": r"<(\/?)font[^>]*>",
     "TRIM": r"^(\s|&nbsp;)+|(\s|&nbsp;)+$",
-    "NORMALIZE": r"\s{2,}",
+    "NORMALIZE": r"[ \t]{2,}",
     "REMOVE_DUP_BREAKS": r"(<br\s*\/?>(\s|&nbsp;?)*){1,}",
     "VIDEO_URL": r"http:\/\/(www\.)?(youtube|vimeo)\.com"
 }
@@ -190,12 +190,9 @@ class ArticleCleaner(object):
     def _remove_empty_paragraph(self):
         elems = self.article.findAll('p')
         for p in elems:
-            print "===="
-            print p.prettify()
             img_embded_obj_count = len(p.findAll(['img', 'embed', 'object']))
             text = ArticleCleaner._trim_spaces(_inner_text(p))
             if img_embded_obj_count == 0 and len(text) == 0:
-                print "=== remove empty paragrapy"
                 p.extract()
 
     def clean(self):
@@ -205,6 +202,7 @@ class ArticleCleaner(object):
         html = ArticleCleaner._remove_dup_breaks(self.article.__str__())
         html = ArticleCleaner._remove_dup_spaces(html)
         html = ArticleCleaner._trim_spaces(html)
+
         self.article = Soup(html)
 
         # elem that considered as junk
@@ -367,7 +365,6 @@ def get_title(html):
     text = _inner_text(title)
     text = ArticleCleaner._remove_dup_spaces(text)
     text = ArticleCleaner._trim_spaces(text)
-    #print text
     _debug('title:', text)
     return text
 
