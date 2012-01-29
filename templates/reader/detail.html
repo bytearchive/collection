@@ -34,6 +34,8 @@ $(document).ready(function() {
         background-color: #f5f5f5;
         padding: 20px 20px 10px 28px;
         margin: -20px -20px 20px;
+    }
+    #article-header h1 {
         border-bottom: 1px solid #DDD;
     }
     #article-url {
@@ -73,6 +75,10 @@ $(document).ready(function() {
     code {
         background: transparent;    
     }
+    #article-meta {
+        margin: 5px 0 0 2px; 
+        font-size: 0.9em;
+    }
 </style>
 <div class="wrapper">
     <section id="content">
@@ -81,6 +87,13 @@ $(document).ready(function() {
             <a id="article-url" href="{{article.article_url}}" title="View original" 
                 style="background: transparent url('https://s2.googleusercontent.com/s2/favicons?domain={{article.site_url}}') 0 center no-repeat;">{{article.site_url}}</a>
             <h1 id="article-title">{{article.title}}</h1>
+           {% if a.author or a.published %}
+            <aside id="article-meta">
+                <span class="author">{{article.author}}</span>
+                <span> - </span>
+                <span class="published">{{article.published}}</span>
+            </aside>
+            {% endif %}
              <!-- TODO: add article time, and author -->
             </header> 
             <section id="article-content">

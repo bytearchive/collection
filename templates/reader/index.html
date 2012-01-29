@@ -63,6 +63,10 @@
         padding: 5px 10px 0 25px;
         border-left: 1px solid #DCD9D5;
     }
+    .article-item-container .article-meta {
+        margin: 0 0 6px 19px;
+        font-size: 0.9em;
+    }
 </style>
 <div class="content">
     <div class="page-header">
@@ -93,6 +97,13 @@
                       <div class="article-item">
                           <h3><a href="{{ a.article_url }}"><img src="//s2.googleusercontent.com/s2/favicons?domain={{a.site_url}}" title="view original from {{a.site_url}}"></img></a>
                               <a href="{% url reader:article_detail a.id %}">{{a.title}}</a> </h3>
+                           {% if a.author or a.published %}
+                            <aside class="article-meta">
+                                <span class="author">{{a.author}}</span>
+                                <span> - </span>
+                                <span class="published">{{a.published}}</span>
+                            </aside>
+                           {% endif %}
                           <p>{{a.summary}}</p>
                        </div>
                        <div class="article-actions-container">

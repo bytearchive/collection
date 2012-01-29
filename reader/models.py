@@ -24,7 +24,7 @@ class Article(DateSupportModel):
 
     def _get_summary(self): 
         text = _inner_text(Soup(self.content))
-        return text[:150] + "..."
+        return text[:120] + "..."
     summary = property(_get_summary)
 
 class UserProfile(DateSupportModel):
