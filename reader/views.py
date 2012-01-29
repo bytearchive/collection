@@ -5,9 +5,23 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from extractor import get_article, get_title
 
+def browse(request, sub_state):
+    reading_cnt = Subscription.objects.filter(subscription_state='UNREAD').count()
+    subs = Subscription.objects.filter(subscription_state=sub_state).order_by('-created').all()[:50]
+    reading_class = sub_state == 'UNREAD' and 'active' or ''
+    achieve_class = sub_state == 'ACHIEVE' and 'active' or ''
+    return render(request, 'reader/index.html', {'subscriptions': subs, \
+        'unread_count': reading_cnt , \
+        'reading_class': reading_class, \
+        'achieve_class': achieve_class
+    })
+    pass
+
 def index(request):
-    articles = list(Article.objects.order_by('-created').all()[:50])
-    return render(request, 'reader/index.html', {'articles': articles})
+    return browse(request, 'UNREAD')
+
+def achieve(request):
+    return browse(request, 'ACHIEVE')
     
 def detail(request, article_id):
     article = Article.objects.get(pk=article_id)
@@ -29,3 +43,9 @@ def create(request):
     Subscription.objects.create(user_profile = user.get_profile(), 
             article = article)
     return HttpResponseRedirect(reverse('reader.views.detail', args=(article.id, )))
+
+def mark_as_read(request, sub_id):
+    sub = Subscription.objects.get(pk=sub_id)
+    sub.subscription_state = 'ACHIEVE'
+    sub.save()
+    return HttpResponseRedirect(reverse('reader.views.index'))

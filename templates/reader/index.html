@@ -31,11 +31,11 @@
 
     .page-header {
         border-bottom: none;
-        padding: 12px 20px 5px;
+        padding: 12px 20px 0;
         margin: -13px -20px 10px;
     }
     .page-header form {
-        margin-top: -40px; 
+        margin-top: -57px; 
         float: right;
         width: 380px;
     }
@@ -47,11 +47,30 @@
     .zebra-striped tr:first-child td{
         border: none !important;
     }
+
+    .article-actions-container {
+        overflow: hidden;
+    }
+    .article-actions-list {
+        margin: 0;
+        border-top: 1px solid #DCD9D5;
+    }
+    .article-actions-list li {
+       list-style-type: none;
+       float: right;
+       line-height: 1em;
+        margin-left: 20px;
+        padding: 5px 10px 0 25px;
+        border-left: 1px solid #DCD9D5;
+    }
 </style>
 <div class="content">
     <div class="page-header">
-        <h1>{% trans "Reading List" %}<small>{{ article.site_url }}</small></h1>
         {% if user.is_authenticated %}
+        <ul class="pills">
+            <li class="{{reading_class}}"><a href="/reader">Reading ({{unread_count}})</a></li>
+            <li class="{{achieve_class}}"><a href="achieve/">Achieve</a></li>
+        </ul> 
         <form action="/reader/create/" method="post">
             {% csrf_token %}
             <div class="input-prepend">
@@ -63,19 +82,38 @@
         {% endif %}
     </div>
     <div class="span14">
-        <table class="zebra-striped bordered-table">
+        {% if subscriptions %}
+        <table id="article-list" class="zebra-striped bordered-table">
         <tbody>
-            {% for a in articles %}
+            {% for sub in subscriptions %}
+                {% with a=sub.article %}
           <tr>
               <td>
-                  <h3><a href="{{a.article_url}}"><img src="//s2.googleusercontent.com/s2/favicons?domain={{a.site_url}}" title="view original from {{a.site_url}}"></img></a>
-                      <a href="/reader/{{a.id}}">{{a.title}}</a> </h3>
-                  {{a.summary}}
+                  <div class="article-item-container">
+                      <div class="article-item">
+                          <h3><a href="{{a.article_url}}"><img src="//s2.googleusercontent.com/s2/favicons?domain={{a.site_url}}" title="view original from {{a.site_url}}"></img></a>
+                              <a href="/reader/{{a.id}}">{{a.title}}</a> </h3>
+                          <p>{{a.summary}}</p>
+                       </div>
+                       <div class="article-actions-container">
+                           <ul class="article-actions-list">
+                               {% if achieve_class  %}
+                               <li> <a href="/reader/unread/{{sub.id}}" class="small">Unread</a> </li>
+                               {% endif %}
+                               {% if reading_class  %}
+                               <li> <a href="/reader/mark-as-read/{{sub.id}}" class="small">Achieve</a> </li>
+                               {% endif %}
+                               <li> <a href="/reader/delete/{{sub.id}}" class="small">Delete</a> </li>
+                           </ul>
+                       </div>
+                  </div>
               </td>
           </tr>
+                {% endwith %}
             {% endfor %}
         </tbody>
         </table>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

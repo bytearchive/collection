@@ -14,3 +14,6 @@ fixtures/initial_data.json
 
 # Mac OS realted file
 .DS_Store
+
+# common task
+scripts/*
