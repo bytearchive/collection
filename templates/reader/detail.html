@@ -68,7 +68,7 @@ $(document).ready(function() {
                 {% endif %}
                 </aside>
                 <ul id="tag-it">
-                    {% for tag in tags %}
+                    {% for tag in sub.tags %}
                         <li>{{tag.name}}</li>
                     {% endfor %}
                 </ul>

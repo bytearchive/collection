@@ -32,27 +32,28 @@ def detail(request, sub_id):
     article = sub.article
     return render(request, 'reader/detail.html', {
         'article': article, 
-        'subscription': sub,
-        'tags': sub.tags
+        'subscription': sub
     })
 
 def subscribe(request, article_url):
-    html = urllib2.urlopen(article_url).read()
+    article, created = Article.objects.get_or_create(article_url = article_url)
+    
+    if not created and article.state == 'UNBUILD':
+        html = urllib2.urlopen(article_url).read()
+        content = get_article(html)
+        title, author, published = get_article_meta(html)
 
-    content = get_article(html)
-    title, author, published = get_article_meta(html)
-    article = Article.objects.create(site_url = site_url,
-                                    article_url = article_url,
-                                    title = title,
-                                    author = author,
-                                    published = published,
-                                    state="done",
-                                    content = content)
+        article.title = title
+        article.author = author
+        article.published = published
+        article.state = "DONE"
+        article.content = content
+        article.save()
 
     user = request.user
-    Subscription.objects.create(user_profile = user.get_profile(), 
+    sub, created = Subscription.objects.get_or_create(user_profile = user.get_profile(), 
             article = article)
-    return HttpResponseRedirect(reverse('reader:article_detail', args=(article.id, )))
+    return HttpResponseRedirect(reverse('reader:article_detail', args=(sub.id, )))
 
 def _normalize_query(query_string):
     findterms=re.compile(r'"([^"]+)"|(\S+)').findall
