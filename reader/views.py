@@ -46,6 +46,7 @@ def subscribe(request, article_url):
                                     title = title,
                                     author = author,
                                     published = published,
+                                    state="done",
                                     content = content)
 
     user = request.user

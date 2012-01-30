@@ -15,11 +15,16 @@ class DateSupportModel(models.Model):
         abstract = True
 
 class Article(DateSupportModel):
+    STATES = (
+        (u'UNBUILD', u'unbuild'), 
+        (u'DONE', u'done'), 
+    )
     article_url = models.CharField(max_length=200, unique=True)
     title = models.CharField(max_length=200, default='')
     author = models.CharField(max_length=50, default='')
     published = models.CharField(max_length=50, default='')
     content = models.TextField(default='')
+    state = models.CharField(max_length=20, choices=STATES, default="unbuild") 
 
     def __unicode__(self):
         return self.title
