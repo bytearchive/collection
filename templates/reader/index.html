@@ -57,6 +57,11 @@
                                <li> <a href="{% url reader:mark_as_read sub.id %}" class="small">Achieve</a> </li>
                                {% endif %}
                                <li> <a href="{% url reader:unsubscribe %}" class="small">Delete</a> </li>
+                                <li class="tag-list">  
+                                {% for tag in sub.user_tags %}
+                                    <span class="label">{{tag.name}}</span>
+                                {% endfor %}
+                                </li>
                            </ul>
                        </div>
                   </div>

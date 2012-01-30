@@ -40,16 +40,16 @@ body {
 }
 
 .article-actions-container {
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 .article-actions-list {
     margin: 0;
     border-top: 1px solid #DCD9D5;
 }
 .article-actions-list li {
-   list-style-type: none;
-   float: right;
-   line-height: 1em;
+    list-style-type: none;
+    float: right;
+    line-height: 1em;
     margin-left: 20px;
     padding: 5px 10px 0 25px;
     border-left: 1px solid #DCD9D5;
@@ -59,4 +59,15 @@ body {
     font-size: 0.9em;
 }
 
-
+.article-actions-list .tag-list {
+    float: left;
+    margin-left: 0;
+    padding-left: 10px;
+}
+.tag-list span.label {
+    text-transform: none;
+    background-color: #0073EA;
+    padding: 2px 5px 3px 5px !important;
+    font-size: 10px;
+    margin-left: 2px;
+}

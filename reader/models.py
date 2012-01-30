@@ -46,6 +46,10 @@ class Subscription(DateSupportModel):
     subscription_state = models.CharField(max_length=20, choices=SUBSCRIPTION_STATE, default="UNREAD") 
     tags = TaggableManager()
 
+    def _get_tags(self):
+        return self.tags.all()
+    user_tags = property(_get_tags)
+
     def __unicode__(self):
         return "%s's article: %s" % (self.user_profile.user, self.article.title)
 
