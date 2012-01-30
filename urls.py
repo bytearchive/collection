@@ -19,6 +19,7 @@ urlpatterns = patterns("",
     url(r"^account/", include("pinax.apps.account.urls")),
     url(r"^openid/", include(PinaxConsumer().urls)),
     url(r"^reader/", include('reader.urls', namespace='reader')),
+    url(r"^bundle/", include('bundle.urls', namespace='bundle')),
 )
 
 

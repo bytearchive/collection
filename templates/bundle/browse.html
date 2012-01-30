@@ -1,0 +1,53 @@
+{% extends "bundle_base.html" %}
+
+{% load i18n %}
+{% load ifsetting_tag %}
+
+{% block head_title %}{% trans "Reading" %}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/main.css">
+{% endblock %}
+
+
+
+{% block body %}
+<div class="content">
+    <div class="page-header">
+        {% if user.is_authenticated %}
+        <ul class="pills">
+            <li class="{{create_class}}"><a href="#">Create</a></li>
+            <li class="{{browse_class}}"><a href="#">Browse</a></li>
+           {% if search_result_count  %}
+           <li class="active"> <a href="#" >Result ({{search_result_count}})</a> </li>
+           {% endif %}
+        </ul> 
+        <form action="{% url reader:search_or_subscribe %}" method="post">
+            {% csrf_token %}
+            <input class="span6" id="search-input" name="query" size="16" type="text"
+            title="Enter article url" placeholder="try #tag, or any keywords"  autofocus="autofocus" value="{{query_text}}">
+        </form>
+        {% endif %}
+    </div>
+    <div id="bundle-body" class="span14 bordered-table">
+        <form id="bundle-form" action="{% url bundle:create %}" method="post">
+            {% csrf_token %}
+        <fieldset>
+          <legend>Create a new bundle</legend>
+          <div class="clearfix">
+            <!--<label for="textarea">Body</label>-->
+            <div class="input">
+              <textarea class="xxlarge span10" id="textarea2" name="bundle_text" rows="20"></textarea>
+              <span class="help-block">
+              </span>
+            </div>
+          </div><!-- /clearfix -->
+          <div class="actions">
+            <input type="submit" class="btn primary" value="Save">
+          </div>
+        </fieldset>
+      </form>
+    </div>
+</div>
+{% endblock %}
+

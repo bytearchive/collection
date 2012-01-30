@@ -1,3 +1,4 @@
+import urllib2
 import re
 from django.db import models
 from django.contrib.auth.models import User
@@ -14,12 +15,11 @@ class DateSupportModel(models.Model):
         abstract = True
 
 class Article(DateSupportModel):
-    site_url = models.CharField(max_length=200)
-    article_url = models.CharField(max_length=200)
-    title = models.CharField(max_length=200)
-    author = models.CharField(max_length=50)
-    published = models.CharField(max_length=50)
-    content = models.TextField()
+    article_url = models.CharField(max_length=200, unique=True)
+    title = models.CharField(max_length=200, default='')
+    author = models.CharField(max_length=50, default='')
+    published = models.CharField(max_length=50, default='')
+    content = models.TextField(default='')
 
     def __unicode__(self):
         return self.title
@@ -31,6 +31,10 @@ class Article(DateSupportModel):
             text_len = 240
         return text[:text_len] + "..."
     summary = property(_get_summary)
+
+    def _get_site_url(self):
+        return urllib2.Request(self.article_url).get_host()
+    site_url = property(_get_site_url) 
 
 class UserProfile(DateSupportModel):
     user = models.OneToOneField(User)
@@ -47,7 +51,7 @@ class Subscription(DateSupportModel):
         (u'REMOVED', u'removed')
     )
     user_profile = models.ForeignKey(UserProfile)
-    article = models.ForeignKey(Article)
+    article = models.ForeignKey(Article, unique=True)
     subscription_state = models.CharField(max_length=20, choices=SUBSCRIPTION_STATE, default="UNREAD") 
     tag_manager = TaggableManager()
 

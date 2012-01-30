@@ -90,3 +90,14 @@ body {
     background-color: rgba(0, 0, 0, 0.9);
     color: white;
 }
+
+
+#bundle-body form {
+    margin-top: 20px;
+}
+
+#bundle-form ,
+#bundle-form .actions,
+#bundle-form fieldset {
+    margin-bottom: 0px; 
+}

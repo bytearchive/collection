@@ -1,0 +1,10 @@
+{% extends "site_base.html" %}
+
+{% load metron_tags %}
+{% load i18n %}
+
+
+{% block menu_bar_bundle %}
+<li class="active_item"><a href="{% url bundle:browse %}">Bundle</a></li>
+{% endblock %}
+

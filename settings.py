@@ -171,6 +171,7 @@ INSTALLED_APPS = [
 
     # my project 
     "reader",
+    "bundle",
 ]
 
 FIXTURE_DIRS = [
