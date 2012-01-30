@@ -16,14 +16,14 @@
         <ul class="pills">
             <li class="{{reading_class}}"><a href="/reader">Reading ({{unread_count}})</a></li>
             <li class="{{achieve_class}}"><a href="{% url reader:view_achieve %}">Achieve</a></li>
+           {% if search_result_count  %}
+           <li class="active"> <a href="#" >Result ({{search_result_count}})</a> </li>
+           {% endif %}
         </ul> 
-        <form action="{% url reader:subscribe %}" method="post">
+        <form action="{% url reader:search_or_subscribe %}" method="post">
             {% csrf_token %}
-            <div class="input-prepend">
-                <input class="span6" id="prependedInput" name="article_url" size="16" type="text"
-                    title="Enter article url" placeholder="Enter article url"  autofocus="autofocus">
-                <span class="add-on">@</span>
-            </div>
+            <input class="span6" id="search-input" name="query" size="16" type="text"
+            title="Enter article url" placeholder="try #tag some other word, or http://balabala"  autofocus="autofocus" value="{{query_text}}">
         </form>
         {% endif %}
     </div>

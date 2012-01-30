@@ -1,9 +1,11 @@
 import urllib2 
+import re
 from models import Article, Subscription
 from django.shortcuts import render_to_response, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from extractor import get_article, get_article_meta
+from django.db.models import Q
 
 def browse(request, sub_state):
     reading_cnt = Subscription.objects.filter(subscription_state='UNREAD').count()
@@ -31,24 +33,66 @@ def detail(request, sub_id):
         'tags': sub.tags.all()
     })
 
-def subscribe(request):
-    article_url = request.POST['article_url']
+def subscribe(request, article_url):
     html = urllib2.urlopen(article_url).read()
 
     site_url = urllib2.Request(article_url).get_host()
     content = get_article(html)
     title, author, published = get_article_meta(html)
     article = Article.objects.create(site_url = site_url,
-            article_url = article_url,
-            title = title,
-            author = author,
-            published = published,
-            content = content)
+        article_url = article_url,
+        title = title,
+        author = author,
+        published = published,
+        content = content)
 
     user = request.user
     Subscription.objects.create(user_profile = user.get_profile(), 
             article = article)
     return HttpResponseRedirect(reverse('reader:article_detail', args=(article.id, )))
+
+def _normalize_query(query_string):
+    findterms=re.compile(r'"([^"]+)"|(\S+)').findall
+    normspace=re.compile(r'\s{2,}').sub
+    parts = [normspace(' ', (t[0] or t[1]).strip()) for t in findterms(query_string)]
+    
+    url = None
+    tags = []
+    words = []
+    is_url = re.compile(r'\S+://\S+').search
+    for p in parts:
+        if p[:1] == '#':
+            tags += [p[1:]]
+        elif is_url(p):
+            url = p
+        else:
+            words += [p]
+    return url, tags, words
+
+def search(request, tags, words):
+    user = request.user
+    q = Q(user_profile=user)
+    if tags:
+        q &= Q(tags__name__in=tags)
+    for word in words:
+        q &= Q(article__title__icontains=word)
+    subs = Subscription.objects.filter(q).order_by('-created')
+    reading_cnt = Subscription.objects.filter(subscription_state='UNREAD').count()
+    search_result_count = len(subs)
+    query_text = " ".join(['#'+t for t in tags] + words)
+    return render(request, 'reader/index.html', {'subscriptions': subs, \
+                'unread_count': reading_cnt , \
+                'search_result_count': search_result_count, 
+                'query_text': query_text
+            })
+
+def search_or_subscribe(request):
+    query = request.POST['query']
+    url, tags, words = _normalize_query(query)
+    if url:
+        return subscribe(request, url)
+    else:
+        return search(request, tags, words)
 
 def unsubscribe(request, sub_id):
     pass

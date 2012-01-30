@@ -28,9 +28,12 @@ body {
 .page-header form {
     margin-top: -52px; 
     float: right;
-    width: 380px;
+    width: 410px;
 }
 
+#search-input {
+    width: 400px;
+}
 .content .span14 {
     min-height: 200px;
 }
@@ -71,3 +74,4 @@ body {
     font-size: 10px;
     margin-left: 2px;
 }
+

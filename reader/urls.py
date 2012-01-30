@@ -3,7 +3,8 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('reader.views',
     url(r"^$", 'index', name='index'),
     url(r"^achieve/$", 'achieve', name='view_achieve'),
-    url(r'^subscribe/$', 'subscribe', name='subscribe'),
+    #url(r'^subscribe/$', 'subscribe', name='subscribe'),
+    url(r'^search_or_subscribe/$', 'search_or_subscribe', name='search_or_subscribe'),
     url(r'^unsubscribe/$', 'unsubscribe', name='unsubscribe'),
 
     url(r'^article/detail/(?P<sub_id>\d+)$', 'detail', name='article_detail'),
