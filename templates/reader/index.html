@@ -3,71 +3,13 @@
 {% load i18n %}
 {% load ifsetting_tag %}
 
-{% block head_title %}{% trans "What Next?" %}{% endblock %}
+{% block head_title %}{% trans "Reading" %}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/main.css">
+{% endblock %}
 
 {% block body %}
-<style type="text/css">
-    html, body {
-        background-color: #eee;
-    }
-    body {
-        padding-top: 40px;
-    }
-    .container {
-        width: 820px; 
-    }
-
-    .content {
-        background-color: #fff;
-        padding: 20px;
-        margin: 0 -20px;
-        -webkit-border-radius: 0 0 6px 6px;
-        -moz-border-radius: 0 0 6px 6px;
-        border-radius: 0 0 6px 6px;
-        -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
-        -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
-        box-shadow: 0 1px 2px rgba(0,0,0,.15);
-    }
-
-    .page-header {
-        border-bottom: none;
-        padding: 12px 20px 0;
-        margin: -13px -20px 10px;
-    }
-    .page-header form {
-        margin-top: -52px; 
-        float: right;
-        width: 380px;
-    }
-
-    .content .span14 {
-        min-height: 200px;
-    }
-
-    .zebra-striped tr:first-child td{
-        border: none !important;
-    }
-
-    .article-actions-container {
-        overflow: hidden;
-    }
-    .article-actions-list {
-        margin: 0;
-        border-top: 1px solid #DCD9D5;
-    }
-    .article-actions-list li {
-       list-style-type: none;
-       float: right;
-       line-height: 1em;
-        margin-left: 20px;
-        padding: 5px 10px 0 25px;
-        border-left: 1px solid #DCD9D5;
-    }
-    .article-item-container .article-meta {
-        margin: 0 0 6px 19px;
-        font-size: 0.9em;
-    }
-</style>
 <div class="content">
     <div class="page-header">
         {% if user.is_authenticated %}

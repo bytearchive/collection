@@ -6,12 +6,16 @@
 {% block head_title_base %}{{article.title}}{% endblock %}
 
 {% block extra_head %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/article.css">
+
 <script src="{{ STATIC_URL }}js/jquery-ui-1.8.17.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}js/tag-it.js" type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/flick/jquery-ui.css">
 <link href="{{ STATIC_URL }}css/jquery.tagit.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="{{ STATIC_URL }}css/prettify.css">
+
 <script src="{{ STATIC_URL }}js/prettify.js"></script>
+
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() { 
     prettyPrint();
@@ -45,91 +49,9 @@ $(document).ready(function() {
 </script>
 {% endblock %}
 
-{% block topbar_base %} {% endblock %}
+{% block topbar_base %}{% endblock %}
 
 {% block body %}
-<script type="text/javascript" charset="utf-8">
-</script>
-<style type="text/css">
-    html, body {
-        background-color: #eee;
-    }
-    body {
-        padding-top: 0px;
-    }
-    .container {
-        width: 866px; 
-    }
-    #article-header {
-        background-color: #f5f5f5;
-        padding: 20px 20px 6px 28px;
-        margin: -20px -20px 20px;
-    }
-    #article-header h1 {
-    }
-    #article-url {
-        padding-left: 20px; 
-    }
-    #article-title {
-        font-size: 26px;
-        margin-bottom: 2px;
-    }
-    #content {
-        background-color: #fff;
-        padding: 20px;
-        margin: 0 -20px;
-        -webkit-border-radius: 0 0 6px 6px;
-        -moz-border-radius: 0 0 6px 6px;
-        border-radius: 0 0 6px 6px;
-        -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
-        -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
-        box-shadow: 0 1px 2px rgba(0,0,0,.15);
-    }
-    #article-content {
-        min-height: 500px;
-        padding-top: 0;
-        font-family: Georgia,"Times New Roman",serif;
-        padding: 0 10px;
-    }
-    #article-content p {
-        font-size: 1.3em;
-        line-height: 1.55em;
-        margin: 0.8em 0;
-    }
-    #article-content li {
-        font-size: 1.3em;
-        line-height: 150%;
-    }
-
-    code {
-        background: transparent;    
-    }
-    #article-meta {
-        margin: -2px 0 0 2px;
-        font-size: 0.9em;
-        border-bottom: 1px solid #DDD;
-        padding-bottom: 2px;
-    }
-    #tag-it {
-        border: none;
-        background: transparent;
-        margin: 6px 0 0 -3px;
-    }
-    #tag-it span {
-        cursor: pointer; 
-    }
-    .tagit-new {
-        padding: 0.1em 4px .25em 0 !important;
-    }
-    .tagit-new input {
-        margin: 0 0 0 3px !important;
-        padding-left: 2px;
-    }
-
-    .hidden {
-        display: none;
-    }
-</style>
 <div class="wrapper">
     <section id="content">
         <article>
