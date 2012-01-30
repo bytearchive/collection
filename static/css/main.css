@@ -2,10 +2,15 @@ html, body {
     background-color: #eee;
 }
 body {
-    padding-top: 40px;
+    padding-top: 30px;
 }
 .container {
-    width: 820px; 
+    width: 920px; 
+}
+
+.content .span14 {
+    min-height: 200px;
+    width: 920px;
 }
 
 .content {
@@ -22,8 +27,8 @@ body {
 
 .page-header {
     border-bottom: none;
-    padding: 12px 20px 0;
-    margin: -13px -20px 10px;
+    padding: 5px 20px 0;
+    margin: -13px -20px -8px;
 }
 .page-header form {
     margin-top: -52px; 
@@ -33,9 +38,6 @@ body {
 
 #search-input {
     width: 400px;
-}
-.content .span14 {
-    min-height: 200px;
 }
 
 .zebra-striped tr:first-child td{
@@ -75,3 +77,16 @@ body {
     margin-left: 2px;
 }
 
+.topbar {
+    height: 36px !important;
+}
+.topbar a {
+    padding: 5px 10px 5px !important;
+}
+.topbar h3 a {
+    font-weight: bold !important;
+}
+.topbar  .nav  li.active_item > a {
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+}

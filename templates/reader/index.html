@@ -9,6 +9,8 @@
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/main.css">
 {% endblock %}
 
+
+
 {% block body %}
 <div class="content">
     <div class="page-header">
@@ -56,9 +58,9 @@
                                {% if reading_class  %}
                                <li> <a href="{% url reader:mark_as_read sub.id %}" class="small">Achieve</a> </li>
                                {% endif %}
-                               <li> <a href="{% url reader:unsubscribe %}" class="small">Delete</a> </li>
+                               <li> <a href="{% url reader:unsubscribe sub.id %}">Delete</a> </li>
                                 <li class="tag-list">  
-                                {% for tag in sub.user_tags %}
+                                {% for tag in sub.tags %}
                                     <span class="label">{{tag.name}}</span>
                                 {% endfor %}
                                 </li>

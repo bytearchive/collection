@@ -1,3 +1,4 @@
+import re
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -25,7 +26,10 @@ class Article(DateSupportModel):
 
     def _get_summary(self): 
         text = _inner_text(Soup(self.content))
-        return text[:120] + "..."
+        text_len = 120
+        if re.search('[a-zA-Z]', text[:5]):
+            text_len = 240
+        return text[:text_len] + "..."
     summary = property(_get_summary)
 
 class UserProfile(DateSupportModel):
@@ -39,16 +43,17 @@ class UserProfile(DateSupportModel):
 class Subscription(DateSupportModel):
     SUBSCRIPTION_STATE = (
         (u'UNREAD', u'unread'),
-        (u'ACHIEVE', u'achieve')
+        (u'ACHIEVE', u'achieve'),
+        (u'REMOVED', u'removed')
     )
     user_profile = models.ForeignKey(UserProfile)
     article = models.ForeignKey(Article)
     subscription_state = models.CharField(max_length=20, choices=SUBSCRIPTION_STATE, default="UNREAD") 
-    tags = TaggableManager()
+    tag_manager = TaggableManager()
 
     def _get_tags(self):
-        return self.tags.all()
-    user_tags = property(_get_tags)
+        return self.tag_manager.all()
+    tags = property(_get_tags)
 
     def __unicode__(self):
         return "%s's article: %s" % (self.user_profile.user, self.article.title)

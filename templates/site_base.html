@@ -3,6 +3,18 @@
 {% load metron_tags %}
 {% load i18n %}
 
+{% block topbar %}
+    <h3><a href="{% url home %}">Collection</a></h3>
+    <ul class="nav">
+        <li class="active_item"><a href="{% url reader:index %}">Reader</a></li>
+        <li><a href="#">Snippet</a></li>
+        <li><a href="https://workflowy.com/">To do</a></li>
+        <li><a href="#">Resource</a></li>
+        <li><a href="#">Open source</a></li>
+    </ul>
+    {% block account_bar %}{% include "_account_bar.html" %}{% endblock %}
+{% endblock %}
+
 {% block extra_head_base %}
     {% block extra_head %}{% endblock %}
 {% endblock %}

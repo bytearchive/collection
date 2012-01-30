@@ -1,11 +1,14 @@
 import urllib2 
 import re
+import logging
 from models import Article, Subscription
 from django.shortcuts import render_to_response, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from extractor import get_article, get_article_meta
 from django.db.models import Q
+
+logger = logging.getLogger(__name__)
 
 def browse(request, sub_state):
     reading_cnt = Subscription.objects.filter(subscription_state='UNREAD').count()
@@ -30,7 +33,7 @@ def detail(request, sub_id):
     return render(request, 'reader/detail.html', {
         'article': article, 
         'subscription': sub,
-        'tags': sub.tags.all()
+        'tags': sub.tags
     })
 
 def subscribe(request, article_url):
@@ -94,13 +97,16 @@ def search_or_subscribe(request):
     else:
         return search(request, tags, words)
 
-def unsubscribe(request, sub_id):
-    pass
-
 def _change_subscription_state(sub_id, change_to='UNREAD'):
     sub = Subscription.objects.get(pk=sub_id)
     sub.subscription_state = change_to
     sub.save()
+
+def unsubscribe(request, sub_id):
+    sub = Subscription.objects.get(pk=sub_id)
+    next_view = sub.subscription_state == 'UNREAD' and 'index' or 'view_achieve'
+    _change_subscription_state(sub_id, 'REMOVED')
+    return HttpResponseRedirect(reverse('reader:' + next_view))
 
 def mark_as_read(request, sub_id):
     _change_subscription_state(sub_id, 'ACHIEVE')
@@ -118,10 +124,10 @@ def _tag_changed(request):
 
 def add_tag(request):
     sub, tag = _tag_changed(request)
-    sub.tags.add(tag);
+    sub.tag_manager.add(tag);
     return HttpResponse('success')
 
 def remove_tag(request):
     sub, tag = _tag_changed(request)
-    sub.tags.remove(tag);
+    sub.tag_manager.remove(tag);
     return HttpResponse('success')
