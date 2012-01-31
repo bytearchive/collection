@@ -41,6 +41,13 @@ class Article(DateSupportModel):
         return urllib2.Request(self.article_url).get_host()
     site_url = property(_get_site_url) 
 
+    def _get_article_url_summary(self):
+        url = self.article_url[:80]
+        if len(self.article_url) > 80:
+            url += "..."
+        return  url
+    article_url_summary = property(_get_article_url_summary) 
+
 class UserProfile(DateSupportModel):
     user = models.OneToOneField(User)
     articles = models.ManyToManyField(Article, through="Subscription")

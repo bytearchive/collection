@@ -101,3 +101,18 @@ body {
 #bundle-form fieldset {
     margin-bottom: 0px; 
 }
+
+.pending-title {
+    display: inline;
+}
+.pending-action {
+    float: right;
+    margin-top: 4px;
+}
+.hidden {
+    display: none !important;
+}
+.retry-form {
+    display: inline;
+    margin-bottom: 0 !important;
+}

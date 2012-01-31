@@ -1,40 +1,44 @@
-import urllib2 
-import re
 import logging
+import re
 from models import Article, Subscription
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from extractor import get_article, get_article_meta
 from django.db.models import Q
+from reader.tasks import update_article
 
 logger = logging.getLogger(__name__)
 
-def browse(request, sub_state='UNREAD'):
+def browse(request, css='READING', sub_state='UNREAD', article_state='DONE', template='reader/index.html'):
     user = request.user.get_profile()
     reading_cnt = Subscription.objects.filter(user_profile=user, state='UNREAD', article__state='DONE').count()
     pending_count = Subscription.objects.filter(user_profile=user, article__state='UNBUILD').count() 
-    subs = Subscription.objects.filter(state=sub_state, article__state='DONE').order_by('-created').all()[:50]
-    reading_class = sub_state == 'UNREAD' and 'active' or ''
-    achieve_class = sub_state == 'ACHIEVE' and 'active' or ''
-    return render(request, 'reader/index.html', {'subscriptions': subs, \
+    subs = Subscription.objects.filter(user_profile=user, state=sub_state, article__state=article_state).order_by('-created').all()[:50]
+   
+    pills = {}
+    for pill in ['READING', 'ACHIEVE', 'PENDING']:
+        pills[pill] = (pill == css and 'active' or '')
+    return render(request, template, {'subscriptions': subs, \
         'unread_count': reading_cnt , \
         'pending_count': pending_count, \
-        'reading_class': reading_class, \
-        'achieve_class': achieve_class
+        'pills': pills
     })
 
 def index(request):
-    return browse(request, 'UNREAD')
+    return browse(request, 'READING', 'UNREAD')
 
 def achieve(request):
-    return browse(request, 'ACHIEVE')
+    return browse(request, 'ACHIEVE', 'ACHIEVE')
    
 # /article/pending
-#def article_pending(request):
+def article_pending(request):
+    return browse(request, 'PENDING', 'UNREAD', 'UNBUILD', 'article/pending.html')
 
-    #pass
-
+# /article/retry
+def article_retry(request):
+    url = request.POST['url']
+    update_article(url)
+    return article_pending(request)
 
 def detail(request, sub_id):
     sub = Subscription.objects.get(pk=sub_id)
@@ -45,23 +49,16 @@ def detail(request, sub_id):
     })
 
 def subscribe(request, article_url):
-    #if not created and article.state == 'UNBUILD':
-        #html = urllib2.urlopen(article_url).read()
-        #content = get_article(html)
-        #title, author, published = get_article_meta(html)
-        #article.title = title
-        #article.author = author
-        #article.published = published
-        #article.state = "DONE"
-        #article.content = content
-        #article.save()
     article, created = Article.objects.get_or_create(article_url = article_url)
     user = request.user
     sub, created = Subscription.objects.get_or_create(user_profile = user.get_profile(), 
             article = article)
-    if article.state == 'DONE':
-        return HttpResponseRedirect(reverse('reader:article_detail', args=(sub.id, )))
-    return HttpResponseRedirect(reverse('reader:browse_articles'))
+
+    # launch asyn job to fetch and extract article content
+    if article.state == 'UNBUILD':
+        update_article(article_url)
+        return HttpResponseRedirect(reverse('reader:browse_articles'))
+    return HttpResponseRedirect(reverse('reader:article_detail', args=(sub.id, )))
 
 def _normalize_query(query_string):
     findterms=re.compile(r'"([^"]+)"|(\S+)').findall
@@ -101,6 +98,7 @@ def search(request, tags, words):
 def search_or_subscribe(request):
     query = request.POST['query']
     url, tags, words = _normalize_query(query)
+    url = url.strip()
     if url:
         return subscribe(request, url)
     else:
