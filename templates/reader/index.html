@@ -18,6 +18,7 @@
         <ul class="pills">
             <li class="{{reading_class}}"><a href="/reader">Reading ({{unread_count}})</a></li>
             <li class="{{achieve_class}}"><a href="{% url reader:view_achieve %}">Achieve</a></li>
+            <li><a href="#">Pending ({{pending_count}})</a></li>
            {% if search_result_count  %}
            <li class="active"> <a href="#" >Result ({{search_result_count}})</a> </li>
            {% endif %}

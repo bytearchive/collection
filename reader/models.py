@@ -24,7 +24,7 @@ class Article(DateSupportModel):
     author = models.CharField(max_length=50, default='')
     published = models.CharField(max_length=50, default='')
     content = models.TextField(default='')
-    state = models.CharField(max_length=20, choices=STATES, default="unbuild") 
+    state = models.CharField(max_length=20, choices=STATES, default="UNBUILD") 
 
     def __unicode__(self):
         return self.title
@@ -50,14 +50,14 @@ class UserProfile(DateSupportModel):
 
 
 class Subscription(DateSupportModel):
-    SUBSCRIPTION_STATE = (
+    STATES = (
         (u'UNREAD', u'unread'),
         (u'ACHIEVE', u'achieve'),
         (u'REMOVED', u'removed')
     )
     user_profile = models.ForeignKey(UserProfile)
     article = models.ForeignKey(Article, unique=True)
-    subscription_state = models.CharField(max_length=20, choices=SUBSCRIPTION_STATE, default="UNREAD") 
+    state = models.CharField(max_length=20, choices=STATES, default="UNREAD") 
     tag_manager = TaggableManager()
 
     def _get_tags(self):

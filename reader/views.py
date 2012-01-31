@@ -10,13 +10,16 @@ from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
-def browse(request, sub_state):
-    reading_cnt = Subscription.objects.filter(subscription_state='UNREAD').count()
-    subs = Subscription.objects.filter(subscription_state=sub_state).order_by('-created').all()[:50]
+def browse(request, sub_state='UNREAD'):
+    user = request.user.get_profile()
+    reading_cnt = Subscription.objects.filter(user_profile=user, state='UNREAD', article__state='DONE').count()
+    pending_count = Subscription.objects.filter(user_profile=user, article__state='UNBUILD').count() 
+    subs = Subscription.objects.filter(state=sub_state, article__state='DONE').order_by('-created').all()[:50]
     reading_class = sub_state == 'UNREAD' and 'active' or ''
     achieve_class = sub_state == 'ACHIEVE' and 'active' or ''
     return render(request, 'reader/index.html', {'subscriptions': subs, \
         'unread_count': reading_cnt , \
+        'pending_count': pending_count, \
         'reading_class': reading_class, \
         'achieve_class': achieve_class
     })
@@ -26,7 +29,13 @@ def index(request):
 
 def achieve(request):
     return browse(request, 'ACHIEVE')
-    
+   
+# /article/pending
+#def article_pending(request):
+
+    #pass
+
+
 def detail(request, sub_id):
     sub = Subscription.objects.get(pk=sub_id)
     article = sub.article
@@ -36,24 +45,23 @@ def detail(request, sub_id):
     })
 
 def subscribe(request, article_url):
+    #if not created and article.state == 'UNBUILD':
+        #html = urllib2.urlopen(article_url).read()
+        #content = get_article(html)
+        #title, author, published = get_article_meta(html)
+        #article.title = title
+        #article.author = author
+        #article.published = published
+        #article.state = "DONE"
+        #article.content = content
+        #article.save()
     article, created = Article.objects.get_or_create(article_url = article_url)
-    
-    if not created and article.state == 'UNBUILD':
-        html = urllib2.urlopen(article_url).read()
-        content = get_article(html)
-        title, author, published = get_article_meta(html)
-
-        article.title = title
-        article.author = author
-        article.published = published
-        article.state = "DONE"
-        article.content = content
-        article.save()
-
     user = request.user
     sub, created = Subscription.objects.get_or_create(user_profile = user.get_profile(), 
             article = article)
-    return HttpResponseRedirect(reverse('reader:article_detail', args=(sub.id, )))
+    if article.state == 'DONE':
+        return HttpResponseRedirect(reverse('reader:article_detail', args=(sub.id, )))
+    return HttpResponseRedirect(reverse('reader:browse_articles'))
 
 def _normalize_query(query_string):
     findterms=re.compile(r'"([^"]+)"|(\S+)').findall
@@ -81,7 +89,7 @@ def search(request, tags, words):
     for word in words:
         q &= Q(article__title__icontains=word)
     subs = Subscription.objects.filter(q).order_by('-created')
-    reading_cnt = Subscription.objects.filter(subscription_state='UNREAD').count()
+    reading_cnt = Subscription.objects.filter(state='UNREAD').count()
     search_result_count = len(subs)
     query_text = " ".join(['#'+t for t in tags] + words)
     return render(request, 'reader/index.html', {'subscriptions': subs, \
@@ -100,12 +108,12 @@ def search_or_subscribe(request):
 
 def _change_subscription_state(sub_id, change_to='UNREAD'):
     sub = Subscription.objects.get(pk=sub_id)
-    sub.subscription_state = change_to
+    sub.state = change_to
     sub.save()
 
 def unsubscribe(request, sub_id):
     sub = Subscription.objects.get(pk=sub_id)
-    next_view = sub.subscription_state == 'UNREAD' and 'index' or 'view_achieve'
+    next_view = sub.state == 'UNREAD' and 'index' or 'view_achieve'
     _change_subscription_state(sub_id, 'REMOVED')
     return HttpResponseRedirect(reverse('reader:' + next_view))
 
@@ -136,7 +144,6 @@ def remove_tag(request):
 
 def browse_bundle(request):
     return render(request, 'bundle/browse.html', {'create_class': 'active'})
-
 
 def create_bundle(request):
     text = request.POST['bundle_text']
