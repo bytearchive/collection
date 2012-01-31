@@ -12,6 +12,9 @@ urlpatterns = patterns('reader.views',
     url(r"^subscription/unread/(?P<sub_id>\d+)$", 'unread', name='unread'),
     url(r"^subscription/tag$", 'add_tag'),
     url(r"^subscription/untag$", 'remove_tag'),
+
+    url(r"^bundle/$", 'browse_bundle', name='browse_bundle'),
+    url(r"^bundle/create$", 'create_bundle', name='create_bundle'),
 )
 
 

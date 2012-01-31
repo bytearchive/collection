@@ -30,7 +30,7 @@
         {% endif %}
     </div>
     <div id="bundle-body" class="span14 bordered-table">
-        <form id="bundle-form" action="{% url bundle:create %}" method="post">
+        <form id="bundle-form" action="{% url reader:create_bundle %}" method="post">
             {% csrf_token %}
         <fieldset>
           <legend>Create a new bundle</legend>

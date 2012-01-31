@@ -7,7 +7,7 @@
     <h3><a href="{% url home %}">Collection</a></h3>
     <ul class="nav">
         {% block menu_bar_bundle %}
-        <li><a href="{% url bundle:browse %}">Bundle</a></li>
+        <li><a href="{% url reader:browse_bundle %}">Bundle</a></li>
         {% endblock %}
         {% block menu_bar_reader %}
         <li><a href="{% url reader:index %}">Reader</a></li>

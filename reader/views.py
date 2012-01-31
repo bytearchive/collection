@@ -132,3 +132,29 @@ def remove_tag(request):
     sub, tag = _tag_changed(request)
     sub.tag_manager.remove(tag);
     return HttpResponse('success')
+
+
+def browse_bundle(request):
+    return render(request, 'bundle/browse.html', {'create_class': 'active'})
+
+
+def create_bundle(request):
+    text = request.POST['bundle_text']
+    soup = Soup(text)
+    
+    b_title = _inner_text(soup.find('h2'))
+    b_tags = [s.strip() for s in _inner_text(soup.find('p')).split(',')]
+    b = Bundle.objects.create(title=b_title, user_profile=request.user.get_profile())
+
+    subs = []
+    for elem in soup.findAll('a'):
+        a, created = Article.objects.get_or_create(article_url=elem['href'])
+        s, created = Subscription.objects.get_or_create(article = a, user_profile=b.user_profile)
+        subs += [s]
+    b.subscriptions = subs
+    b.tag_manager.add(*b_tags)
+    b.save()
+
+    return HttpResponseRedirect(reverse('reader:browse_bundle'), )
+   
+

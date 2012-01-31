@@ -171,8 +171,7 @@ INSTALLED_APPS = [
     "djcelery",
 
     # my project 
-    "reader",
-    "bundle",
+    "reader"
 ]
 
 FIXTURE_DIRS = [
