@@ -1,7 +1,7 @@
 import logging
 import os 
 import re
-from models import Article, Subscription
+from models import Article, Subscription, Bundle
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -147,8 +147,14 @@ def remove_tag(request):
 
 
 def browse_bundle(request):
-    return render(request, 'bundle/browse.html', {'browse_class': 'active'})
-
+    user = _user(request)
+    bundle_total = Bundle.objects.filter(user_profile=user, state='ALIVE').count()
+    bundles = Bundle.objects.filter(user_profile=user, state="ALIVE")
+    return render(request, 'bundle/browse.html', {
+        'bundle_total': bundle_total,
+        'bundles': bundles,
+        'browse_class': 'active'}
+    )
 
 def bundle_create(request, url):
     user = _user(request)  

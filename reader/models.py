@@ -90,6 +90,10 @@ class Bundle(DateSupportModel):
         return self.tag_manager.all()
     tags = property(_get_tags)
 
+    def _get_subscription_count(self):
+        return self.subscriptions.count()
+    subscription_count = property(_get_subscription_count)
+
     def __unicode__(self):
         return "bundle: %s" % (self.title)
 

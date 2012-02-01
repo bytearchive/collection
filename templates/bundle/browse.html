@@ -16,7 +16,7 @@
     <div class="page-header">
         {% if user.is_authenticated %}
         <ul class="pills">
-            <li class="{{browse_class}}"><a href="#">Browse</a></li>
+            <li class="{{browse_class}}"><a href="#">Browse ({{bundle_total}})</a></li>
            {% if search_result_count  %}
            <li class="active"> <a href="#" >Result ({{search_result_count}})</a> </li>
            {% endif %}
@@ -28,7 +28,45 @@
         </form>
         {% endif %}
     </div>
-    <div id="bundle-body" class="span14 bordered-table">
+    <div class="span14">
+        {% if bundles %}
+        <table id="article-list" class="zebra-striped bordered-table">
+        <tbody>
+            {% for b in bundles %}
+          <tr>
+              <td>
+                  <div class="article-item-container">
+                      <div class="article-item">
+                          <h3> {{b.title}} </h3>
+                            <aside class="article-meta">
+                                <span class="article-info">{{b.subscription_count}} articles</span>
+                                <span style="padding: 0 6px;"></span>
+                                <span class="published">{{b.created}}</span>
+                            </aside>
+                       </div>
+                       <div class="article-actions-container">
+                           <ul class="article-actions-list">
+                               {% if pills.ACHIEVE  %}
+                               <li> <a href="#" class="small">Unread</a> </li>
+                               {% endif %}
+                               {% if pills.READING  %}
+                               <li> <a href="#" class="small">Achieve</a> </li>
+                               {% endif %}
+                               <li> <a href="#">Delete</a> </li>
+                                <li class="tag-list">  
+                                {% for tag in b.tags %}
+                                    <span class="label">{{tag.name}}</span>
+                                {% endfor %}
+                                </li>
+                           </ul>
+                       </div>
+                  </div>
+              </td>
+          </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
