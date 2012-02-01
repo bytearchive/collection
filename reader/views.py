@@ -1,13 +1,19 @@
 import logging
+import os 
 import re
 from models import Article, Subscription
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from reader.tasks import update_article
+from reader.tasks import update_article, create_bundle_task
 
 logger = logging.getLogger(__name__)
+
+# help functions
+def _user(request):
+    return request.user.get_profile()
+
 
 def browse(request, css='READING', sub_state='UNREAD', article_state='DONE', template='reader/index.html'):
     user = request.user.get_profile()
@@ -37,7 +43,8 @@ def article_pending(request):
 # /article/retry
 def article_retry(request):
     url = request.POST['url']
-    update_article(url)
+    user = _user(request)
+    update_article.delay(user.id, url)
     return article_pending(request)
 
 def detail(request, sub_id):
@@ -56,7 +63,7 @@ def subscribe(request, article_url):
 
     # launch asyn job to fetch and extract article content
     if article.state == 'UNBUILD':
-        update_article(article_url)
+        update_article.delay(user.id, article_url)
         return HttpResponseRedirect(reverse('reader:browse_articles'))
     return HttpResponseRedirect(reverse('reader:article_detail', args=(sub.id, )))
 
@@ -73,7 +80,7 @@ def _normalize_query(query_string):
         if p[:1] == '#':
             tags += [p[1:]]
         elif is_url(p):
-            url = p
+            url = p.strip()
         else:
             words += [p]
     return url, tags, words
@@ -98,7 +105,6 @@ def search(request, tags, words):
 def search_or_subscribe(request):
     query = request.POST['query']
     url, tags, words = _normalize_query(query)
-    url = url.strip()
     if url:
         return subscribe(request, url)
     else:
@@ -141,25 +147,17 @@ def remove_tag(request):
 
 
 def browse_bundle(request):
-    return render(request, 'bundle/browse.html', {'create_class': 'active'})
+    return render(request, 'bundle/browse.html', {'browse_class': 'active'})
 
-def create_bundle(request):
-    text = request.POST['bundle_text']
-    soup = Soup(text)
-    
-    b_title = _inner_text(soup.find('h2'))
-    b_tags = [s.strip() for s in _inner_text(soup.find('p')).split(',')]
-    b = Bundle.objects.create(title=b_title, user_profile=request.user.get_profile())
 
-    subs = []
-    for elem in soup.findAll('a'):
-        a, created = Article.objects.get_or_create(article_url=elem['href'])
-        s, created = Subscription.objects.get_or_create(article = a, user_profile=b.user_profile)
-        subs += [s]
-    b.subscriptions = subs
-    b.tag_manager.add(*b_tags)
-    b.save()
-
+def bundle_create(request, url):
+    user = _user(request)  
+    create_bundle_task.delay(user.id, url) 
     return HttpResponseRedirect(reverse('reader:browse_bundle'), )
    
-
+def bundle_search_or_create(request):
+    query = request.POST['query']
+    url, tag, words = _normalize_query(query)
+    if url:
+        return bundle_create(request, url)
+    return bundle_create(request, url)

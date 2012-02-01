@@ -1,27 +1,27 @@
 from celery.decorators import task
 from celery.task.sets import subtask
-from reader.models import Article
-from reader.extractor import get_article, get_article_meta
+from reader.models import Article, Bundle, Subscription, UserProfile
+from reader.extractor import get_article, get_article_meta, BundelExtractor
 from urllib2 import urlopen
 
 
 @task(ignore_result=True)
-def update_article(url):
+def update_article(user_id, url):
     logger = update_article.get_logger()
     logger.info('starting update article task: ' + url)
-    fetch_page.delay(url, callback=subtask(parse_html))
+    fetch_page.delay(user_id, url, callback=subtask(update_article_task))
 
 @task(ignore_result=True)
-def fetch_page(url, callback=None):
+def fetch_page(user_id, url, callback=None):
     logger = fetch_page.get_logger()
     logger.info('fetch page: ' + url)
     html = urlopen(url).read()
     if callback:
-        subtask(callback).delay(url, html)
+        subtask(callback).delay(user_id, url, html)
 
 @task(ignore_result=True)
-def parse_html(url, html):
-    logger = parse_html.get_logger()
+def update_article_task(user_id, url, html):
+    logger = update_article_task.get_logger()
     logger.info('parse html: ' + url)
     article, created = Article.objects.get_or_create(article_url=url)
     content = get_article(html)
@@ -32,3 +32,29 @@ def parse_html(url, html):
     article.state = "DONE"
     article.content = content
     article.save()
+
+@task(ignore_result=True)
+def analysis_bundle_task(user_id, url, page, callback=None):
+    logger = analysis_bundle_task.get_logger()
+    logger.info('analysis bundle task ' + url)
+    extractor = BundelExtractor(page)
+    extractor.extract()
+    #user = UserProfile.objects.get(id=user_id)
+    b, created = Bundle.objects.get_or_create(user_profile_id=user_id, url=url)
+    b.title = extractor.title
+    if extractor.tags:
+        b.tag_manager.add(*extractor.tags)
+    if callback:
+        for href in extractor.urls:
+            article, created = Article.objects.get_or_create(article_url=href)
+            sub, created = Subscription.objects.get_or_create(user_profile_id=user_id, article=article)
+            b.subscriptions.add(sub)
+            subtask(callback).delay(user_id, href)
+    b.save()
+
+@task(ignore_result=True)
+def create_bundle_task(user_id, url):
+    logger = create_bundle_task.get_logger()
+    logger.info('staring create bundle task ' + url)
+    fetch_page.delay(user_id, url, callback=subtask(analysis_bundle_task, 
+        callback=subtask(fetch_page, callback=subtask(update_article_task))))

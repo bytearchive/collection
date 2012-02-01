@@ -210,9 +210,9 @@ class ArticleCleaner(object):
         junk_elems = ['form', 'object', 'h1', 'iframe']
         self._remove_elem(junk_elems)
 
-        # only one h2 was considered as misuse h1 as title, so remove it
-        if len(self.article.findAll('h2')) == 1:
-            self._remove_elem('h2')
+         #only one h2 was considered as misuse h1 as title, so remove it
+        #if len(self.article.findAll('h2')) == 1:
+            #self._remove_elem('h2')
         
         fishy_elems = ['table', 'ul', 'div']
         self._remove_elem_conditionally(fishy_elems)
@@ -300,13 +300,14 @@ class ArticleExtractor(object):
             c[READABILITY] *= (1.0 - get_link_density(c))
             if not top_candidate or c[READABILITY] > top_candidate[READABILITY]:
                 top_candidate = c
-        _debug('top candidate: ', top_candidate.name, ' [id] ', _attr(top_candidate, 'id'), ' [class]', _attr(top_candidate, 'class'))
+        if top_candidate:
+            _debug('top candidate: ', top_candidate.name, ' [id] ', _attr(top_candidate, 'id'), ' [class]', _attr(top_candidate, 'class'))
         #print top_candidate.prettify()
 
         # use body if top_candidate not found
         if top_candidate is None:
             top_candidate = self.doc.html.body
-            init_readability(top_candidate)
+            self.init_readability(top_candidate)
         self.top_candidate = top_candidate
 
     def merge_related_elems(self):
@@ -402,10 +403,51 @@ class ArticleMetaExtractor(object):
         _debug('title:', text)
         return text
 
-def extract(file_path = "author.html"):
+class BundelExtractor(object):
+    """extracto bundle info from html page"""
+    def __init__(self, html):
+        super(BundelExtractor, self).__init__()
+        self.html = html
+        self.doc = Soup(html)
+
+    def extract_content(self):
+        self.content = self.doc.find('div', attrs={'id': 'content'}).div
+
+        # remove title
+        self.content.find('h2').extract()
+        # remove div s
+        [t.extract() for t in self.content.findAll('div')]
+        
+        cleaner = ArticleCleaner(self.content)
+        cleaner._remove_empty_paragraph()
+        self.content = cleaner.article
+        del self.content['class']
+
+    def extract(self):
+        # title
+        self.title = _inner_text(self.doc.find('h2'))
+        #_debug(self.title)
+
+        # tags
+        tag_candis = self.doc.find('div', attrs={'class': 'meta'}).findAll('a')
+        self.tags = []
+        for c in tag_candis:
+            if _has_attr(c, 'rel') and _attr(c, 'rel') == 'tag':
+                self.tags += [_inner_text(c)]
+        _debug(self.tags)
+        
+        # post
+        self.extract_content()
+
+        # urls
+        self.urls = [a['href'] for a in self.content.findAll('a')]
+        #_debug(self.urls)
+
+
+def extract(file_path = "django.html"):
     with open(file_path, "r") as file:
         html = ''.join(file.readlines())
-    print get_article_meta(html)
+    BundelExtractor(html).extract()
 
 def get_article_meta(html):
     meta = ArticleMetaExtractor(html)
