@@ -82,6 +82,7 @@ class Bundle(DateSupportModel):
     user_profile = models.ForeignKey(UserProfile)
     url = models.CharField(max_length=200, unique=True)
     title = models.CharField(max_length=200, default='')
+    content = models.TextField(default='')
     tag_manager = TaggableManager()
     subscriptions = models.ManyToManyField(Subscription)
     state = models.CharField(max_length=20, choices=STATES, default=u"ALIVE") 

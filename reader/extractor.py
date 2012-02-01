@@ -442,6 +442,7 @@ class BundelExtractor(object):
         # urls
         self.urls = [a['href'] for a in self.content.findAll('a')]
         #_debug(self.urls)
+        self.content = self.content.__str__()
 
 
 def extract(file_path = "django.html"):

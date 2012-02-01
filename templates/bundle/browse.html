@@ -37,7 +37,7 @@
               <td>
                   <div class="article-item-container">
                       <div class="article-item">
-                          <h3> {{b.title}} </h3>
+                          <h3><a href="{% url reader:bundle_detail b.id %}">{{b.title}}</a></h3>
                             <aside class="article-meta">
                                 <span class="article-info">{{b.subscription_count}} articles</span>
                                 <span style="padding: 0 6px;"></span>

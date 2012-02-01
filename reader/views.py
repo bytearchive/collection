@@ -146,20 +146,21 @@ def remove_tag(request):
     return HttpResponse('success')
 
 
-def browse_bundle(request):
+def browse_bundles(request):
     user = _user(request)
     bundle_total = Bundle.objects.filter(user_profile=user, state='ALIVE').count()
     bundles = Bundle.objects.filter(user_profile=user, state="ALIVE")
     return render(request, 'bundle/browse.html', {
         'bundle_total': bundle_total,
         'bundles': bundles,
-        'browse_class': 'active'}
-    )
+        'browse_class': 'active'
+    })
+
 
 def bundle_create(request, url):
     user = _user(request)  
     create_bundle_task.delay(user.id, url) 
-    return HttpResponseRedirect(reverse('reader:browse_bundle'), )
+    return HttpResponseRedirect(reverse('reader:browse_bundles'))
    
 def bundle_search_or_create(request):
     query = request.POST['query']
@@ -167,3 +168,7 @@ def bundle_search_or_create(request):
     if url:
         return bundle_create(request, url)
     return bundle_create(request, url)
+
+def bundle_detail(request, bundle_id):
+    b = Bundle.objects.get(pk=bundle_id)
+    return render(request, 'bundle/detail.html', {'bundle': b})

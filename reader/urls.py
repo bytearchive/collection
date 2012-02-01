@@ -16,9 +16,9 @@ urlpatterns = patterns('reader.views',
     url(r"^subscription/tag$", 'add_tag'),
     url(r"^subscription/untag$", 'remove_tag'),
 
-    url(r"^bundle/$", 'browse_bundle', name='browse_bundle'),
-    url(r'^bundle/bundle_search_or_create/$', 'bundle_search_or_create', name='bundle_search_or_create'),
-    #url(r"^bundle/create$", 'bundle_create', name='bundle_create'),
+    url(r"^bundle/$", 'browse_bundles', name='browse_bundles'),
+    url(r"^bundle/detail/(?P<bundle_id>\d+)$", 'bundle_detail', name='bundle_detail'),
+    url(r'^bundle/bundle_search_or_create$', 'bundle_search_or_create', name='bundle_search_or_create'),
 )
 
 

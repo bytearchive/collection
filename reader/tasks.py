@@ -34,22 +34,23 @@ def update_article_task(user_id, url, html):
     article.save()
 
 @task(ignore_result=True)
-def analysis_bundle_task(user_id, url, page, callback=None):
+def analysis_bundle_task(user_id, url, html, callback=None):
     logger = analysis_bundle_task.get_logger()
     logger.info('analysis bundle task ' + url)
-    extractor = BundelExtractor(page)
+    extractor = BundelExtractor(html)
     extractor.extract()
-    #user = UserProfile.objects.get(id=user_id)
     b, created = Bundle.objects.get_or_create(user_profile_id=user_id, url=url)
+    b.content = extractor.content
     b.title = extractor.title
     if extractor.tags:
         b.tag_manager.add(*extractor.tags)
     if callback:
         for href in extractor.urls:
-            article, created = Article.objects.get_or_create(article_url=href)
+            article, article_created = Article.objects.get_or_create(article_url=href)
             sub, created = Subscription.objects.get_or_create(user_profile_id=user_id, article=article)
             b.subscriptions.add(sub)
-            subtask(callback).delay(user_id, href)
+            if article_created:
+                subtask(callback).delay(user_id, href)
     b.save()
 
 @task(ignore_result=True)
