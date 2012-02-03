@@ -28,7 +28,7 @@ body {
 .page-header {
     border-bottom: none;
     padding: 5px 20px 0;
-    margin: -13px -20px -8px;
+    margin: -5px -20px -8px;
 }
 .page-header form {
     margin-top: -52px; 
@@ -76,19 +76,8 @@ body {
     font-size: 10px;
     margin-left: 2px;
 }
-
-.topbar {
-    height: 36px !important;
-}
-.topbar a {
-    padding: 5px 10px 5px !important;
-}
-.topbar h3 a {
-    font-weight: bold !important;
-}
-.topbar  .nav  li.active_item > a {
-    background-color: rgba(0, 0, 0, 0.9);
-    color: white;
+.article-actions-list form {
+    margin-bottom: 0;
 }
 
 

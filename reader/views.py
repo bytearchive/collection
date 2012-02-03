@@ -1,13 +1,13 @@
 import logging
-import os 
 import re
-from models import Article, Subscription
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from reader.models import Article
+from reader.tasks import process_article_task
 from django.db.models import Q
-from reader.tasks import update_article
+from django.http import HttpResponse, HttpResponseRedirect 
+from django.core.urlresolvers import reverse
+from django.views.generic import ListView, DetailView
 from django.utils import simplejson
+
 
 logger = logging.getLogger(__name__)
 
@@ -15,162 +15,143 @@ logger = logging.getLogger(__name__)
 def _user(request):
     return request.user.get_profile()
 
+class ArticleDetailView(DetailView):
+    model = Article
+    template_name = "reader/article/detail.html"
+    context_object_name = "article"
 
-def browse(request, css='READING', sub_state='UNREAD', article_state='DONE', template='reader/index.html'):
-    user = request.user.get_profile()
-    reading_cnt = Subscription.objects.filter(user_profile=user, state='UNREAD', article__state='DONE').count()
-    pending_count = Subscription.objects.filter(user_profile=user, article__state='UNBUILD').count() 
-    subs = Subscription.objects.filter(user_profile=user, state=sub_state, article__state=article_state).order_by('-created').all()[:50]
-   
-    pills = {}
-    for pill in ['READING', 'ACHIEVE', 'PENDING']:
-        pills[pill] = (pill == css and 'active' or '')
-    return render(request, template, {'subscriptions': subs, \
-        'unread_count': reading_cnt , \
-        'pending_count': pending_count, \
-        'pills': pills
-    })
+class ArticleListView(ListView):
+    context_object_name = 'article_list'
+    template_name = "reader/article/list.html"
 
-def index(request):
-    return browse(request, 'READING', 'UNREAD')
+    def get_queryset(self):
+        user = _user(self.request)
+        return Article.objects.filter(user=user, state='UNREAD', deleted=False)
 
-def achieve(request):
-    return browse(request, 'ACHIEVE', 'ACHIEVE')
-   
-# /article/pending
-def article_pending(request):
-    return browse(request, 'PENDING', 'UNREAD', 'UNBUILD', 'article/pending.html')
+    def get_context_data(self, **kwargs):
+        user = _user(self.request)
+        context = super(ArticleListView, self).get_context_data(**kwargs)
+        
+        reading_count = Article.objects.filter(user=user, state='UNREAD', deleted=False).count()
+        context['reading_count'] = reading_count
 
-# /article/retry
-def article_retry(request):
-    url = request.POST['url']
+        self.ping_reading(context)
+        return context
+
+    def ping_reading(self, context):
+        context['UNREAD'] = 'active' 
+
+class AchievedArticleListView(ArticleListView):
+    def get_queryset(self):
+        user = _user(self.request)
+        return Article.objects.filter(user=user, state='ACHIEVE', deleted=False)
+        
+    def ping_reading(self, context):
+        context['ACHIEVE'] = 'active' 
+
+class SearchedArticleListView(ArticleListView):
+
+    def _normalize_query(self, query_string):
+        findterms=re.compile(r'"([^"]+)"|(\S+)').findall
+        normspace=re.compile(r'\s{2,}').sub
+        parts = [normspace(' ', (t[0] or t[1]).strip()) for t in findterms(query_string)]
+        
+        url = None
+        tags = []
+        words = []
+        is_url = re.compile(r'\S+://\S+').search
+        for p in parts:
+            if p[:1] == '#':
+                tags += [p[1:]]
+            elif is_url(p):
+                url = p.strip()
+            else:
+                words += [p]
+        return url, tags, words
+
+    def get_queryset(self):
+        query = self.request.GET['query']
+        user = _user(self.request)
+        url, tags, words = self._normalize_query(query)
+
+        q = Q(user=user)
+        if tags:
+            q &= Q(tags__name__in=tags)
+        for word in words:
+            q &= Q(title__icontains=word) | Q(content__icontains=word)
+        return Article.objects.filter(q)
+       
+    def get_context_data(self, **kwargs):
+        context = super(SearchedArticleListView, self).get_context_data(**kwargs)
+        context['query'] = self.request.GET['query']
+        return context
+
+    def ping_reading(self, context):
+        context['RESULT'] = 'active' 
+
+def subscribe(req):
+    html = req.POST['html']
+    url = req.POST['url']
+    user = _user(req)
+    article, created = Article.objects.get_or_create(user=user, url=url)
+    article.html = html
+    article.save()
+    process_article_task.delay(user.id, url, html)
+    return HttpResponse(simplejson.dumps({"is_saved": True}))
+
+## /article/pending
+#def article_pending(request):
+    #return browse(request, 'PENDING', 'UNREAD', 'UNBUILD', 'article/pending.html')
+
+# /article/rebuild
+def rebuild(request):
     user = _user(request)
-    update_article.delay(user.id, url)
-    return article_pending(request)
+    a = Article.objects.get(pk=request.POST['article_id'])
+    process_article_task.delay(user.id, a.url, a.html)
+    return HttpResponseRedirect(reverse('reader:articles'))
 
-def detail(request, sub_id):
-    sub = Subscription.objects.get(pk=sub_id)
-    article = sub.article
-    return render(request, 'reader/detail.html', {
-        'article': article, 
-        'subscription': sub
-    })
+def unsubscribe(request, article_id):
+    a = Article.objects.get(pk=article_id)
+    a.delete()
+    return HttpResponseRedirect(reverse('reader:articles'))
 
-def subscribe(request, article_url):
-    article, created = Article.objects.get_or_create(article_url = article_url)
-    user = request.user
-    sub, created = Subscription.objects.get_or_create(user_profile = user.get_profile(), 
-            article = article)
-    # launch asyn job to fetch and extract article content
-    if article.state == 'UNBUILD':
-        update_article.delay(user.id, article_url)
-        return HttpResponseRedirect(reverse('reader:browse_articles'))
-    return HttpResponseRedirect(reverse('reader:article_detail', args=(sub.id, )))
+def _change_article_state(article_id, change_to='UNREAD'):
+    a = Article.objects.get(pk=article_id)
+    a.state = change_to
+    a.save()
 
-def _normalize_query(query_string):
-    findterms=re.compile(r'"([^"]+)"|(\S+)').findall
-    normspace=re.compile(r'\s{2,}').sub
-    parts = [normspace(' ', (t[0] or t[1]).strip()) for t in findterms(query_string)]
-    
-    url = None
-    tags = []
-    words = []
-    is_url = re.compile(r'\S+://\S+').search
-    for p in parts:
-        if p[:1] == '#':
-            tags += [p[1:]]
-        elif is_url(p):
-            url = p.strip()
-        else:
-            words += [p]
-    return url, tags, words
+def mark_as_read(request, article_id):
+    _change_article_state(article_id, 'ACHIEVE')
+    return HttpResponseRedirect(reverse('reader:articles'))
 
-def search(request, tags, words):
-    user = request.user
-    q = Q(user_profile=user)
-    if tags:
-        q &= Q(tags__name__in=tags)
-    for word in words:
-        q &= Q(article__title__icontains=word)
-    subs = Subscription.objects.filter(q).order_by('-created')
-    reading_cnt = Subscription.objects.filter(state='UNREAD').count()
-    search_result_count = len(subs)
-    query_text = " ".join(['#'+t for t in tags] + words)
-    return render(request, 'reader/index.html', {'subscriptions': subs, \
-                'unread_count': reading_cnt , \
-                'search_result_count': search_result_count, 
-                'query_text': query_text
-            })
-
-def search_or_subscribe(request):
-    query = request.POST['query']
-    url, tags, words = _normalize_query(query)
-    if url:
-        return subscribe(request, url)
-    else:
-        return search(request, tags, words)
-
-def _change_subscription_state(sub_id, change_to='UNREAD'):
-    sub = Subscription.objects.get(pk=sub_id)
-    sub.state = change_to
-    sub.save()
-
-def unsubscribe(request, sub_id):
-    sub = Subscription.objects.get(pk=sub_id)
-    next_view = sub.state == 'UNREAD' and 'index' or 'view_achieve'
-    _change_subscription_state(sub_id, 'REMOVED')
-    return HttpResponseRedirect(reverse('reader:' + next_view))
-
-def mark_as_read(request, sub_id):
-    _change_subscription_state(sub_id, 'ACHIEVE')
-    return HttpResponseRedirect(reverse('reader:index'))
-
-def unread(request, sub_id):
-    _change_subscription_state(sub_id, 'UNREAD')
-    return HttpResponseRedirect(reverse('reader:view_achieve'))
+def unread(request, article_id):
+    _change_article_state(article_id, 'UNREAD')
+    return HttpResponseRedirect(reverse('reader:achieved'))
 
 def _tag_changed(request):
     tag = request.POST['tag_name']
-    sub_id = int(request.POST['sub_id'])
-    sub = Subscription.objects.get(pk=sub_id)
-    return sub, tag
+    article_id = int(request.POST['article_id'])
+    a = Article.objects.get(pk=article_id)
+    return a, tag
 
 def add_tag(request):
-    sub, tag = _tag_changed(request)
-    sub.tag_manager.add(tag);
+    a, tag = _tag_changed(request)
+    a.tags.add(tag);
     return HttpResponse('success')
 
 def remove_tag(request):
-    sub, tag = _tag_changed(request)
-    sub.tag_manager.remove(tag);
+    a, tag = _tag_changed(request)
+    a.tags.remove(tag);
     return HttpResponse('success')
 
-def sub_check_existence(request):
+def check_existence(request):
     url = request.GET['url']
     is_saved = False
     if request.user.is_authenticated():
         user = _user(request)
         try:
-            sub = Subscription.objects.get(user_profile=user, article__article_url=url)
-            is_saved = sub.state != 'REMOVED' and True or False
+            sub = Article.objects.get(user=user, url=url, deleted=False)
+            is_saved = True
         except Exception, e:
             sub = None
-    return HttpResponse(simplejson.dumps({"is_saved": is_saved}))
-
-
-def sub_toggle(request):
-    url = request.POST['url']
-    user = _user(request)
-    is_saved = False
-    if request.user.is_authenticated():
-        a, created = Article.objects.get_or_create(article_url=url)
-        if a.state == 'UNBUILD':
-            update_article.delay(user.id, url)
-        sub, created = Subscription.objects.get_or_create(user_profile=user, article=a)
-        if not created and sub.state != "REMOVED":
-            sub.state = 'REMOVED'
-        else:
-            is_saved = True
-            sub.state = 'UNREAD'
-        sub.save()
     return HttpResponse(simplejson.dumps({"is_saved": is_saved}))

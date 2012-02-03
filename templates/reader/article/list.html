@@ -14,32 +14,30 @@
     <div class="page-header">
         {% if user.is_authenticated %}
         <ul class="pills">
-            <li class="{{ pills.READING }}"><a href="/reader">Reading ({{unread_count}})</a></li>
-            <li class="{{ pills.ACHIEVE }}"><a href="{% url reader:view_achieve %}">Achieve</a></li>
-            <li class="{{ pills.PENDING }}"><a href="{% url reader:article_pending %}">Pending ({{pending_count}})</a></li>
-           {% if search_result_count  %}
-           <li class="active"> <a href="#" >Result ({{search_result_count}})</a> </li>
+            <li class="{{ UNREAD }}"><a href="{% url reader:articles %}">Reading ({{reading_count}})</a></li>
+            <li class="{{ ACHIEVE }}"><a href="{% url reader:achieved %}">Achieve</a></li>
+           {% if RESULT  %}
+               <li class="active"> <a href="#" >Result ({{article_list.count}})</a> </li>
            {% endif %}
         </ul> 
-        <form action="{% url reader:search_or_subscribe %}" method="post">
+        <form action="{% url reader:search %}" method="get">
             {% csrf_token %}
             <input class="span6" id="search-input" name="query" size="16" type="text"
-            title="Enter article url" placeholder="try #tag some other word, or http://balabala"  autofocus="autofocus" value="{{query_text}}">
+            title="Enter article url" placeholder="search by #tag or keyword"  autofocus="autofocus" value="{{query_text}}">
         </form>
         {% endif %}
     </div>
     <div class="span14">
-        {% if subscriptions %}
+        {% if article_list %}
         <table id="article-list" class="zebra-striped bordered-table">
         <tbody>
-            {% for sub in subscriptions %}
-                {% with a=sub.article %}
+            {% for a in article_list %}
           <tr>
               <td>
                   <div class="article-item-container">
                       <div class="article-item">
-                          <h3><a href="{{ a.article_url }}"><img src="//s2.googleusercontent.com/s2/favicons?domain={{a.site_url}}" title="view original from {{a.site_url}}"></img></a>
-                              <a href="{% url reader:article_detail sub.id %}">{{a.title}}</a> </h3>
+                          <h3><a href="{{ a.url }}"><img src="//s2.googleusercontent.com/s2/favicons?domain={{a.site_url}}" title="view original from {{a.site_url}}"></img></a>
+                              <a href="{% url reader:article_detail a.id %}">{{a.title}}</a> </h3>
                            {% if a.author or a.published %}
                             <aside class="article-meta">
                                 <span class="author">{{a.author}}</span>
@@ -51,15 +49,22 @@
                        </div>
                        <div class="article-actions-container">
                            <ul class="article-actions-list">
-                               {% if pills.ACHIEVE  %}
-                               <li> <a href="{% url reader:unread sub.id  %}" class="small">Unread</a> </li>
+                               {% if ACHIEVE  %}
+                               <li> <a href="{% url reader:unread a.id %}" class="small">Unread</a> </li>
                                {% endif %}
-                               {% if pills.READING  %}
-                               <li> <a href="{% url reader:mark_as_read sub.id %}" class="small">Achieve</a> </li>
+                               {% if UNREAD  %}
+                               <li> <a href="{% url reader:mark_as_read a.id %}" class="small">Achieve</a> </li>
                                {% endif %}
-                               <li> <a href="{% url reader:unsubscribe sub.id %}">Delete</a> </li>
+                               <li> <a href="{% url reader:unsubscribe a.id %}">Delete</a> </li>
+                                <li> 
+                                    <form action="{% url reader:rebuild %}" method="POST">
+                                        {% csrf_token %}
+                                        <input class="hidden" name="article_id" type="text" value="{{a.id}}">
+                                        <input class="btn" type="submit" value="rebuild">
+                                    </form>
+                                </li>
                                 <li class="tag-list">  
-                                {% for tag in sub.tags %}
+                                {% for tag in a.tags.all %}
                                     <span class="label">{{tag.name}}</span>
                                 {% endfor %}
                                 </li>
@@ -68,7 +73,6 @@
                   </div>
               </td>
           </tr>
-                {% endwith %}
             {% endfor %}
         </tbody>
         </table>

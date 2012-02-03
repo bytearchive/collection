@@ -205,6 +205,7 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 
+# define the output of get_profile()
 AUTH_PROFILE_MODULE = 'reader.UserProfile'
 
 

@@ -10,24 +10,40 @@ from taggit.managers import TaggableManager
 class DateSupportModel(models.Model):
     updated = models.DateTimeField('date upated', auto_now=True, auto_now_add=True)
     created = models.DateTimeField('date created', auto_now_add=True)
+    deleted = models.BooleanField(default=False)
 
     class Meta:
+        ordering = ['-created']
         abstract = True
+
+    def delete(self):
+        self.deleted = True
+        self.save()
+
+class UserProfile(DateSupportModel):
+    user = models.OneToOneField(User)
+
+    def __unicode__(self):
+        return self.user.username
 
 class Article(DateSupportModel):
     STATES = (
-        (u'UNBUILD', u'unbuild'), 
-        (u'DONE', u'done'), 
+        (u'UNREAD', u'unread'),
+        (u'ACHIEVE', u'achieve')
     )
-    article_url = models.CharField(max_length=200, unique=True)
-    title = models.CharField(max_length=200, default='')
-    author = models.CharField(max_length=50, default='')
+    url = models.CharField(max_length=255, unique=True)
+    title = models.CharField(max_length=255, default='')
+    author = models.CharField(max_length=100, default='')
     published = models.CharField(max_length=50, default='')
-    content = models.TextField(default='')
-    state = models.CharField(max_length=20, choices=STATES, default="UNBUILD") 
+    content = models.TextField()
+    html = models.TextField()
+    state = models.CharField(max_length=20, choices=STATES, default="UNREAD") 
+
+    user = models.ForeignKey(UserProfile)
+    tags = TaggableManager()
 
     def __unicode__(self):
-        return self.title
+        return self.url
 
     def _get_summary(self): 
         text = _inner_text(Soup(self.content))
@@ -38,41 +54,16 @@ class Article(DateSupportModel):
     summary = property(_get_summary)
 
     def _get_site_url(self):
-        return urllib2.Request(self.article_url).get_host()
+        return urllib2.Request(self.url).get_host()
     site_url = property(_get_site_url) 
 
-    def _get_article_url_summary(self):
-        url = self.article_url[:80]
-        if len(self.article_url) > 80:
+    def _get_url_summary(self):
+        url = self.url[:80]
+        if len(self.url) > 80:
             url += "..."
         return  url
-    article_url_summary = property(_get_article_url_summary) 
+    url_summary = property(_get_url_summary) 
 
-class UserProfile(DateSupportModel):
-    user = models.OneToOneField(User)
-    articles = models.ManyToManyField(Article, through="Subscription")
-
-    def __unicode__(self):
-        return self.user.username
-
-
-class Subscription(DateSupportModel):
-    STATES = (
-        (u'UNREAD', u'unread'),
-        (u'ACHIEVE', u'achieve'),
-        (u'REMOVED', u'removed')
-    )
-    user_profile = models.ForeignKey(UserProfile)
-    article = models.ForeignKey(Article, unique=True)
-    state = models.CharField(max_length=20, choices=STATES, default="UNREAD") 
-    tag_manager = TaggableManager()
-
-    def _get_tags(self):
-        return self.tag_manager.all()
-    tags = property(_get_tags)
-
-    def __unicode__(self):
-        return "%s's article: %s" % (self.user_profile.user, self.article.title)
 
 # hook UserProfile with User
 def create_user_profile(sender, instance, created, **kwargs):

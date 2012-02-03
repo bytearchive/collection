@@ -403,52 +403,9 @@ class ArticleMetaExtractor(object):
         _debug('title:', text)
         return text
 
-class BundelExtractor(object):
-    """extracto bundle info from html page"""
-    def __init__(self, html):
-        super(BundelExtractor, self).__init__()
-        self.html = html
-        self.doc = Soup(html)
-
-    def extract_content(self):
-        self.content = self.doc.find('div', attrs={'id': 'content'}).div
-
-        # remove title
-        self.content.find('h2').extract()
-        # remove div s
-        [t.extract() for t in self.content.findAll('div')]
-        
-        cleaner = ArticleCleaner(self.content)
-        cleaner._remove_empty_paragraph()
-        self.content = cleaner.article
-        del self.content['class']
-
-    def extract(self):
-        # title
-        self.title = _inner_text(self.doc.find('h2'))
-        #_debug(self.title)
-
-        # tags
-        tag_candis = self.doc.find('div', attrs={'class': 'meta'}).findAll('a')
-        self.tags = []
-        for c in tag_candis:
-            if _has_attr(c, 'rel') and _attr(c, 'rel') == 'tag':
-                self.tags += [_inner_text(c)]
-        _debug(self.tags)
-        
-        # post
-        self.extract_content()
-
-        # urls
-        self.urls = [a['href'] for a in self.content.findAll('a')]
-        #_debug(self.urls)
-        self.content = self.content.__str__()
-
-
 def extract(file_path = "django.html"):
     with open(file_path, "r") as file:
         html = ''.join(file.readlines())
-    BundelExtractor(html).extract()
 
 def get_article_meta(html):
     meta = ArticleMetaExtractor(html)

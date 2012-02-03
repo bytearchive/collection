@@ -19,14 +19,15 @@
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() { 
     prettyPrint();
+
     $("#tag-it").tagit({
         placeholderText: "add tag..",
         onTagAdded: function(event, tag) {
             var name = $(tag).find('input').val();
-            var sub_id = $('#sub_id').text();
-            $.post('/reader/subscription/tag', {
+            var id = $('#article_id').text();
+            $.post('/reader/article/tag', {
                     "tag_name": name,
-                    "sub_id": sub_id
+                    "article_id": id
                 },
                 function(data) {
                     console.log('tag: ' + name + ' added.');
@@ -34,10 +35,10 @@ $(document).ready(function() {
         },
         onTagRemoved: function(event, tag) {
             var name = $(tag).find('input').val();
-            var sub_id = $('#sub_id').text();
-            $.post('/reader/subscription/untag', {
+            var id = $('#article_id').text();
+            $.post('/reader/article/untag', {
                     "tag_name": name,
-                    "sub_id": sub_id
+                    "article_id": id
                 },
                 function(data) {
                     console.log('tag: ' + name + ' removed.');
@@ -56,7 +57,7 @@ $(document).ready(function() {
     <section id="content">
         <article>
             <header id="article-header"> 
-            <a id="article-url" href="{{article.article_url}}" title="View original" 
+            <a id="article-url" href="{{article.url}}" title="View original" 
                 style="background: transparent url('https://s2.googleusercontent.com/s2/favicons?domain={{article.site_url}}') 0 center no-repeat;">{{article.site_url}}</a>
             <h1 id="article-title">{{article.title}}</h1>
             <div id="article-meta-container">
@@ -68,7 +69,7 @@ $(document).ready(function() {
                 {% endif %}
                 </aside>
                 <ul id="tag-it">
-                    {% for tag in sub.tags %}
+                    {% for tag in article.tags.all %}
                         <li>{{tag.name}}</li>
                     {% endfor %}
                 </ul>
@@ -79,7 +80,7 @@ $(document).ready(function() {
             </section>
         </article>
     </section>
-    <div id="sub_id" class="hidden">{{subscription.id}}</div>
+    <div id="article_id" class="hidden">{{article.id}}</div>
 </div>
 {% endblock %}
 

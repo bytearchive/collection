@@ -7,7 +7,7 @@
     <h3><a href="{% url home %}">Collection</a></h3>
     <ul class="nav">
         {% block menu_bar_reader %}
-        <li><a href="{% url reader:index %}">Reader</a></li>
+        <li><a href="{% url reader:articles %}">Reader</a></li>
         {% endblock %}
     </ul>
     {% block account_bar %}{% include "_account_bar.html" %}{% endblock %}
