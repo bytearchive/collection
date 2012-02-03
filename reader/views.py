@@ -1,12 +1,12 @@
 import logging
 import os 
 import re
-from models import Article, Subscription, Bundle
+from models import Article, Subscription
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from reader.tasks import update_article, create_bundle_task
+from reader.tasks import update_article
 from django.utils import simplejson
 
 logger = logging.getLogger(__name__)
@@ -145,39 +145,8 @@ def remove_tag(request):
     sub.tag_manager.remove(tag);
     return HttpResponse('success')
 
-
-def browse_bundles(request):
-    user = _user(request)
-    bundle_total = Bundle.objects.filter(user_profile=user, state='ALIVE').count()
-    bundles = Bundle.objects.filter(user_profile=user, state="ALIVE")
-    return render(request, 'bundle/browse.html', {
-        'bundle_total': bundle_total,
-        'bundles': bundles,
-        'browse_class': 'active'
-    })
-
-
-def bundle_create(request, url):
-    user = _user(request)  
-    create_bundle_task.delay(user.id, url) 
-    return HttpResponseRedirect(reverse('reader:browse_bundles'))
-   
-def bundle_search_or_create(request):
-    query = request.POST['query']
-    url, tag, words = _normalize_query(query)
-    if url:
-        return bundle_create(request, url)
-    return bundle_create(request, url)
-
-def bundle_detail(request, bundle_id):
-    b = Bundle.objects.get(pk=bundle_id)
-    return render(request, 'bundle/detail.html', {'bundle': b})
-
 def sub_check_existence(request):
-    print "user-check: "
-    print request.user.is_authenticated()
     url = request.GET['url']
-    print url
     is_saved = False
     if request.user.is_authenticated():
         user = _user(request)

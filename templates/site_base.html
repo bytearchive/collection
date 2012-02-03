@@ -6,13 +6,9 @@
 {% block topbar %}
     <h3><a href="{% url home %}">Collection</a></h3>
     <ul class="nav">
-        {% block menu_bar_bundle %}
-        <li><a href="{% url reader:browse_bundles %}">Bundle</a></li>
-        {% endblock %}
         {% block menu_bar_reader %}
         <li><a href="{% url reader:index %}">Reader</a></li>
         {% endblock %}
-        <li><a href="https://workflowy.com/#/5f590683-5878-125f-3224-06f11b39453c">To do</a></li>
     </ul>
     {% block account_bar %}{% include "_account_bar.html" %}{% endblock %}
 {% endblock %}

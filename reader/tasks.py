@@ -1,6 +1,6 @@
 from celery.decorators import task
 from celery.task.sets import subtask
-from reader.models import Article, Bundle, Subscription, UserProfile
+from reader.models import Article, Subscription, UserProfile
 from reader.extractor import get_article, get_article_meta, BundelExtractor
 from urllib2 import urlopen
 
@@ -32,30 +32,3 @@ def update_article_task(user_id, url, html):
     article.state = "DONE"
     article.content = content
     article.save()
-
-@task(ignore_result=True)
-def analysis_bundle_task(user_id, url, html, callback=None):
-    logger = analysis_bundle_task.get_logger()
-    logger.info('analysis bundle task ' + url)
-    extractor = BundelExtractor(html)
-    extractor.extract()
-    b, created = Bundle.objects.get_or_create(user_profile_id=user_id, url=url)
-    b.content = extractor.content
-    b.title = extractor.title
-    if extractor.tags:
-        b.tag_manager.add(*extractor.tags)
-    if callback:
-        for href in extractor.urls:
-            article, article_created = Article.objects.get_or_create(article_url=href)
-            sub, created = Subscription.objects.get_or_create(user_profile_id=user_id, article=article)
-            b.subscriptions.add(sub)
-            if article_created:
-                subtask(callback).delay(user_id, href)
-    b.save()
-
-@task(ignore_result=True)
-def create_bundle_task(user_id, url):
-    logger = create_bundle_task.get_logger()
-    logger.info('staring create bundle task ' + url)
-    fetch_page.delay(user_id, url, callback=subtask(analysis_bundle_task, 
-        callback=subtask(fetch_page, callback=subtask(update_article_task))))
