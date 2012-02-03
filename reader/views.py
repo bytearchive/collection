@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from reader.tasks import update_article, create_bundle_task
+from django.utils import simplejson
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +61,6 @@ def subscribe(request, article_url):
     user = request.user
     sub, created = Subscription.objects.get_or_create(user_profile = user.get_profile(), 
             article = article)
-
     # launch asyn job to fetch and extract article content
     if article.state == 'UNBUILD':
         update_article.delay(user.id, article_url)
@@ -172,3 +172,36 @@ def bundle_search_or_create(request):
 def bundle_detail(request, bundle_id):
     b = Bundle.objects.get(pk=bundle_id)
     return render(request, 'bundle/detail.html', {'bundle': b})
+
+def sub_check_existence(request):
+    print "user-check: "
+    print request.user.is_authenticated()
+    url = request.GET['url']
+    print url
+    is_saved = False
+    if request.user.is_authenticated():
+        user = _user(request)
+        try:
+            sub = Subscription.objects.get(user_profile=user, article__article_url=url)
+            is_saved = sub.state != 'REMOVED' and True or False
+        except Exception, e:
+            sub = None
+    return HttpResponse(simplejson.dumps({"is_saved": is_saved}))
+
+
+def sub_toggle(request):
+    url = request.POST['url']
+    user = _user(request)
+    is_saved = False
+    if request.user.is_authenticated():
+        a, created = Article.objects.get_or_create(article_url=url)
+        if a.state == 'UNBUILD':
+            update_article.delay(user.id, url)
+        sub, created = Subscription.objects.get_or_create(user_profile=user, article=a)
+        if not created and sub.state != "REMOVED":
+            sub.state = 'REMOVED'
+        else:
+            is_saved = True
+            sub.state = 'UNREAD'
+        sub.save()
+    return HttpResponse(simplejson.dumps({"is_saved": is_saved}))
