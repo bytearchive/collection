@@ -3,14 +3,10 @@
 {% load metron_tags %}
 {% load i18n %}
 
-{% block topbar %}
-    <h3><a href="{% url home %}">Collection</a></h3>
-    <ul class="nav">
-        {% block menu_bar_reader %}
-        <li><a href="{% url reader:articles %}">Reader</a></li>
-        {% endblock %}
-    </ul>
-    {% block account_bar %}{% include "_account_bar.html" %}{% endblock %}
+{% block nav %}
+<ul class="nav">
+    <li class="active"><a href="{% url reader:articles %}">Reader</a></li>
+</ul>
 {% endblock %}
 
 {% block extra_head_base %}

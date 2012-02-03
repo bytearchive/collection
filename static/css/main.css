@@ -15,7 +15,7 @@ body {
 
 .content {
     background-color: #fff;
-    padding: 20px;
+    padding: 15px 25px 10px 25px;
     margin: 0 -20px;
     -webkit-border-radius: 0 0 6px 6px;
     -moz-border-radius: 0 0 6px 6px;
@@ -28,39 +28,41 @@ body {
 .page-header {
     border-bottom: none;
     padding: 5px 20px 0;
-    margin: -5px -20px -8px;
+    margin: 0 -20px -8px;
 }
 .page-header form {
-    margin-top: -52px; 
+    margin-top: -46px; 
     float: right;
     width: 410px;
 }
 
 #search-input {
-    width: 400px;
+    width: 379px;
 }
 
-.zebra-striped tr:first-child td{
-    border: none !important;
+#article-list {
+    margin-left: 0;
 }
-
-.article-actions-container {
-    /*overflow: hidden;*/
+.article-item {
+    padding: 5px 0 0 5px;
+}
+.article-item .btn-group {
+    float: right; 
+    margin-top: -4px;
+}
+.btn-toolbar {
+    margin: 0;
 }
 .article-actions-list {
     margin: 0;
-    border-top: 1px solid #DCD9D5;
 }
 .article-actions-list li {
     list-style-type: none;
     float: right;
     line-height: 1em;
-    margin-left: 20px;
-    padding: 5px 10px 0 25px;
-    border-left: 1px solid #DCD9D5;
+    padding: 5px 0 0 2px;
 }
 .article-item-container .article-meta {
-    margin: 0 0 6px 19px;
     font-size: 0.9em;
 }
 
@@ -76,32 +78,48 @@ body {
     font-size: 10px;
     margin-left: 2px;
 }
-.article-actions-list form {
-    margin-bottom: 0;
+.article-tags {
+    margin-left: 6px;
 }
 
-
-#bundle-body form {
-    margin-top: 20px;
+.tag {
+    margin: 0 5px 5px 15px;
+    float: left;
+    background: #FDFDFD;
+    color: #939393;
+    border-top: 1px solid #E9E9E9;
+    border-bottom: 1px solid lightGrey;
+    border-right: 1px solid #D6D6D6;
+    -webkit-border-radius: 0 4px 4px 0;
+    -moz-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
 }
-
-#bundle-form ,
-#bundle-form .actions,
-#bundle-form fieldset {
-    margin-bottom: 0px; 
+.tag:hover {
+    background:#f3fcff;cursor:pointer
 }
-
-.pending-title {
-    display: inline;
+.tag .ar {
+    margin-left: -15px;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    width: 15px;
+    height: 21px;
+    background: url('../img/sprite.png') no-repeat 0 0;
 }
-.pending-action {
-    float: right;
-    margin-top: 4px;
+.tag:hover .ar {
+    background-position:-15px 0
 }
-.hidden {
-    display: none !important;
+.tag * {
+    float: left;
 }
-.retry-form {
-    display: inline;
-    margin-bottom: 0 !important;
+.tag .co {
+    border-top: 1px solid #FDFDFD;
+    border-bottom: 1px solid #F8F9F9;
+    border-right: 1px solid #F9FAFA;
+    -webkit-border-radius: 0 4px 4px 0;
+    -moz-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
+}
+.tag .name {
+    line-height: 17px;
+    padding: 0 6px 0 4px;
 }

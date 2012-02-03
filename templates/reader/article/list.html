@@ -1,4 +1,4 @@
-{% extends "reader_base.html" %}
+{% extends "site_base.html" %}
 
 {% load i18n %}
 {% load ifsetting_tag %}
@@ -7,35 +7,60 @@
 
 {% block extra_head %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/main.css">
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() { 
+    $('.article-item-container').hover(
+        function() {
+            var btns = $(this).find('.btn-group');
+            btns.show();
+        }, 
+        function() {
+            var btns = $(this).find('.btn-group');
+            btns.hide();
+        });
+});
+</script>
 {% endblock %}
 
 {% block body %}
-<div class="content">
+<div class="content span14">
     <div class="page-header">
         {% if user.is_authenticated %}
-        <ul class="pills">
+        <ul class="nav nav-pills">
             <li class="{{ UNREAD }}"><a href="{% url reader:articles %}">Reading ({{reading_count}})</a></li>
             <li class="{{ ACHIEVE }}"><a href="{% url reader:achieved %}">Achieve</a></li>
            {% if RESULT  %}
                <li class="active"> <a href="#" >Result ({{article_list.count}})</a> </li>
            {% endif %}
-        </ul> 
-        <form action="{% url reader:search %}" method="get">
+        </ul>
+        <form action="{% url reader:search %}" method="get" class="form-search">
             {% csrf_token %}
-            <input class="span6" id="search-input" name="query" size="16" type="text"
+            <input class="span6 search-query" id="search-input" name="query" size="16" type="search"
             title="Enter article url" placeholder="search by #tag or keyword"  autofocus="autofocus" value="{{query_text}}">
         </form>
         {% endif %}
     </div>
-    <div class="span14">
+    <div id="article-list" class="span14">
         {% if article_list %}
-        <table id="article-list" class="zebra-striped bordered-table">
+        <table  class="table table-bordered table-condensed">
         <tbody>
             {% for a in article_list %}
           <tr>
               <td>
                   <div class="article-item-container">
                       <div class="article-item">
+
+                        <div class="btn-group" style="display: none;">
+                            <a class="btn"><i class="icon-trash"></i> Delete</a>
+                           {% if ACHIEVE  %}
+                           <a class="btn"><i class="icon-repeat"></i> Unachieve</a>
+                           {% endif %}
+                            <a class="btn"><i class="icon-refresh"></i> Reload</a>
+                           {% if UNREAD  %}
+                            <a class="btn"><i class="icon-ok"></i> Achieve</a>
+                           {% endif %}
+                        </div>
+
                           <h3><a href="{{ a.url }}"><img src="//s2.googleusercontent.com/s2/favicons?domain={{a.site_url}}" title="view original from {{a.site_url}}"></img></a>
                               <a href="{% url reader:article_detail a.id %}">{{a.title}}</a> </h3>
                            {% if a.author or a.published %}
@@ -47,28 +72,15 @@
                            {% endif %}
                           <p>{{a.summary}}</p>
                        </div>
-                       <div class="article-actions-container">
-                           <ul class="article-actions-list">
-                               {% if ACHIEVE  %}
-                               <li> <a href="{% url reader:unread a.id %}" class="small">Unread</a> </li>
-                               {% endif %}
-                               {% if UNREAD  %}
-                               <li> <a href="{% url reader:mark_as_read a.id %}" class="small">Achieve</a> </li>
-                               {% endif %}
-                               <li> <a href="{% url reader:unsubscribe a.id %}">Delete</a> </li>
-                                <li> 
-                                    <form action="{% url reader:rebuild %}" method="POST">
-                                        {% csrf_token %}
-                                        <input class="hidden" name="article_id" type="text" value="{{a.id}}">
-                                        <input class="btn" type="submit" value="rebuild">
-                                    </form>
-                                </li>
-                                <li class="tag-list">  
-                                {% for tag in a.tags.all %}
-                                    <span class="label">{{tag.name}}</span>
-                                {% endfor %}
-                                </li>
-                           </ul>
+                       <div class="article-tags">
+                        {% for tag in a.tags.all %}
+                            <div class="tag">
+                                <div class="ar" a="rem"></div>
+                                <div class="co">
+                                    <span class="name">{{tag.name}}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
                        </div>
                   </div>
               </td>
