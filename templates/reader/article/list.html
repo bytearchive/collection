@@ -9,15 +9,27 @@
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/main.css">
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() { 
-    $('.article-item-container').hover(
+    var csrf = $('[name=csrfmiddlewaretoken]').val();
+    var csrf_name = "csrfmiddlewaretoken";
+
+    $('.article-item-container').parent().hover(
         function() {
             var btns = $(this).find('.btn-group');
-            btns.show();
+            btns.removeClass('hidden');
         }, 
         function() {
             var btns = $(this).find('.btn-group');
-            btns.hide();
-        });
+            btns.addClass('hidden');
+        }
+    );
+
+    $('.article-actions-form .btn').click(function() {
+        var form = $(this).closest('form');
+        var url = this.href;
+        form.attr('action', url);
+        form.submit();
+        return false;
+    });
 });
 </script>
 {% endblock %}
@@ -49,17 +61,21 @@ $(document).ready(function() {
               <td>
                   <div class="article-item-container">
                       <div class="article-item">
-
-                        <div class="btn-group" style="display: none;">
-                            <a class="btn"><i class="icon-trash"></i> Delete</a>
-                           {% if ACHIEVE  %}
-                           <a class="btn"><i class="icon-repeat"></i> Unachieve</a>
-                           {% endif %}
-                            <a class="btn"><i class="icon-refresh"></i> Reload</a>
-                           {% if UNREAD  %}
-                            <a class="btn"><i class="icon-ok"></i> Achieve</a>
-                           {% endif %}
-                        </div>
+                        
+                        <form method="POST" class="article-actions-form" style="margin: 0;">
+                            <input type="hidden" name="article_id" value="{{a.id}}">
+                            {% csrf_token %}
+                            <div class="btn-group hidden">
+                                <a class="btn" href="{% url reader:unsubscribe %}"><i class="icon-trash"></i> Delete</a>
+                               {% if ACHIEVE  %}
+                               <a class="btn" href="{% url reader:unachieve %}"><i class="icon-repeat"></i> Unachieve</a>
+                               {% endif %}
+                                <a class="btn" href="{% url reader:reload %}"><i class="icon-refresh"></i> Reload</a>
+                               {% if UNREAD  %}
+                                <a class="btn" href="{% url reader:achieve %}"><i class="icon-ok"></i> Achieve</a>
+                               {% endif %}
+                            </div>
+                        </form>
 
                           <h3><a href="{{ a.url }}"><img src="//s2.googleusercontent.com/s2/favicons?domain={{a.site_url}}" title="view original from {{a.site_url}}"></img></a>
                               <a href="{% url reader:article_detail a.id %}">{{a.title}}</a> </h3>

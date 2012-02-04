@@ -99,18 +99,15 @@ def subscribe(req):
     process_article_task.delay(user.id, url, html)
     return HttpResponse(simplejson.dumps({"is_saved": True}))
 
-## /article/pending
-#def article_pending(request):
-    #return browse(request, 'PENDING', 'UNREAD', 'UNBUILD', 'article/pending.html')
-
-# /article/rebuild
-def rebuild(request):
+# /article/reload
+def reload(request):
     user = _user(request)
     a = Article.objects.get(pk=request.POST['article_id'])
     process_article_task.delay(user.id, a.url, a.html)
     return HttpResponseRedirect(reverse('reader:articles'))
 
-def unsubscribe(request, article_id):
+def unsubscribe(request):
+    article_id = request.POST['article_id'];
     a = Article.objects.get(pk=article_id)
     a.delete()
     return HttpResponseRedirect(reverse('reader:articles'))
@@ -120,11 +117,13 @@ def _change_article_state(article_id, change_to='UNREAD'):
     a.state = change_to
     a.save()
 
-def mark_as_read(request, article_id):
+def achieve(request):
+    article_id = request.POST['article_id'];
     _change_article_state(article_id, 'ACHIEVE')
     return HttpResponseRedirect(reverse('reader:articles'))
 
-def unread(request, article_id):
+def unachieve(request):
+    article_id = request.POST['article_id'];
     _change_article_state(article_id, 'UNREAD')
     return HttpResponseRedirect(reverse('reader:achieved'))
 

@@ -46,6 +46,9 @@ body {
 .article-item {
     padding: 5px 0 0 5px;
 }
+.article-item p {
+    margin: 3px 0 8px 7px;
+}
 .article-item .btn-group {
     float: right; 
     margin-top: -4px;
@@ -83,7 +86,7 @@ body {
 }
 
 .tag {
-    margin: 0 5px 5px 15px;
+    margin: -2px 5px 3px 17px;
     float: left;
     background: #FDFDFD;
     color: #939393;
