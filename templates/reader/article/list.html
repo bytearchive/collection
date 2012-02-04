@@ -7,6 +7,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/main.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/tag.css">
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() { 
     var csrf = $('[name=csrfmiddlewaretoken]').val();
@@ -88,10 +89,10 @@ $(document).ready(function() {
                            {% endif %}
                           <p>{{a.summary}}</p>
                        </div>
-                       <div class="article-tags">
+                       <div class="tag-list">
                         {% for tag in a.tags.all %}
                             <div class="tag">
-                                <div class="ar" a="rem"></div>
+                                <div class="arrow"></div>
                                 <div class="co">
                                     <span class="name">{{tag.name}}</span>
                                 </div>

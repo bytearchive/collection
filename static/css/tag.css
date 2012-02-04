@@ -1,0 +1,45 @@
+.tag-list {
+    margin-left: 6px;
+    overflow: hidden;
+}
+.tag-list .tag {
+    margin: 0 5px 3px 17px;
+    float: left;
+    background: #FDFDFD;
+    color: #939393;
+    border-top: 1px solid #E9E9E9;
+    border-bottom: 1px solid lightGrey;
+    border-right: 1px solid #D6D6D6;
+    -webkit-border-radius: 0 4px 4px 0;
+    -moz-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
+}
+.tag-list .tag:hover {
+    background:#f3fcff;cursor:pointer
+}
+.tag-list .tag .arrow {
+    margin-left: -15px;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    width: 15px;
+    height: 21px;
+    background: url('../img/sprite.png') no-repeat 0 0;
+}
+.tag-list .tag:hover .arrow {
+    background-position:-15px 0
+}
+.tag-list .tag * {
+    float: left;
+}
+.tag-list .tag .co {
+    border-top: 1px solid #FDFDFD;
+    border-bottom: 1px solid #F8F9F9;
+    border-right: 1px solid #F9FAFA;
+    -webkit-border-radius: 0 4px 4px 0;
+    -moz-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
+}
+.tag-list .tag .name {
+    line-height: 17px;
+    padding: 0 6px 0 4px;
+}

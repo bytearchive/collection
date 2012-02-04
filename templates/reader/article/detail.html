@@ -1,65 +1,98 @@
-{% extends "theme_base.html" %}
+{% extends "site_base.html" %}
 
 {% load i18n %}
 {% load ifsetting_tag %}
 
-{% block head_title_base %}{{article.title}}{% endblock %}
+{% block head_title %}{% trans "Detail" %}{% endblock %}
+
+{% comment %}
+    remove the title bar
+{% endcomment %}
+{% block topbar_base %}{% endblock %}  
 
 {% block extra_head %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/tag.css">
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/article.css">
-
-<script src="{{ STATIC_URL }}js/jquery-ui-1.8.17.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="{{ STATIC_URL }}js/tag-it.js" type="text/javascript" charset="utf-8"></script>
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/flick/jquery-ui.css">
-<link href="{{ STATIC_URL }}css/jquery.tagit.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="{{ STATIC_URL }}css/prettify.css">
-
 <script src="{{ STATIC_URL }}js/prettify.js"></script>
-
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function() { 
     prettyPrint();
 
-    $("#tag-it").tagit({
-        placeholderText: "add tag..",
-        onTagAdded: function(event, tag) {
-            var name = $(tag).find('input').val();
-            var id = $('#article_id').text();
-            $.post('/reader/article/tag', {
-                    "tag_name": name,
-                    "article_id": id
-                },
-                function(data) {
-                    console.log('tag: ' + name + ' added.');
-                });
-        },
-        onTagRemoved: function(event, tag) {
-            var name = $(tag).find('input').val();
-            var id = $('#article_id').text();
-            $.post('/reader/article/untag', {
-                    "tag_name": name,
-                    "article_id": id
-                },
-                function(data) {
-                    console.log('tag: ' + name + ' removed.');
-                });
+    var remove_tag = function($item) {
+        $item.detach();
+        var name = $item.find('.name').text();
+        var id = $('#article_id').text();
+        $.post('/reader/article/untag/', {
+                "tag_name": name,
+                "article_id": id
+            },
+            function(data) {
+                console.log('tag: ' + name + ' removed.');
+            });
+    };
+
+    var add_tag = function(name) {
+        var item = $('<div class="tag"> <div class="arrow"></div> <div class="co"> <span class="name">' + name + '</span> </div> </div>');
+        $('.tag-list').append(item);
+        item.click(function() {
+            remove_tag(item);
+        });
+
+        var id = $('#article_id').text();
+        $.post('/reader/article/tag/', {
+                "tag_name": name,
+                "article_id": id
+            },
+            function(data) {
+                console.log('tag: ' + name + ' added.');
+            });
+    };
+
+    $("input[name=tag-input]").keydown(function(evt) {
+        if (evt.keyCode == 13) {
+            var tag = $(this).val();
+            if (!tag)
+                return ;
+            $(this).val("");
+            add_tag(tag);
         }
+    });
+
+    $("#article-header .arrow").click(function() {
+        var tag = $(this).parent();
+        remove_tag(tag);
     });
 
 });
 </script>
 {% endblock %}
 
-{% block topbar_base %}{% endblock %}
 
 {% block body %}
 <div class="wrapper">
     <section id="content">
         <article>
             <header id="article-header"> 
-            <a id="article-url" href="{{article.url}}" title="View original" 
-                style="background: transparent url('https://s2.googleusercontent.com/s2/favicons?domain={{article.site_url}}') 0 center no-repeat;">{{article.site_url}}</a>
-            <h1 id="article-title">{{article.title}}</h1>
+               <div class="tag-list">
+                <div id="tag-input-container">
+                    <input type="text" class="span2" name="tag-input" value="" placeholder="add tag">
+                </div>
+                {% for tag in article.tags.all %}
+                    <div class="tag">
+                        <div class="arrow"></div>
+                        <div class="co">
+                            <span class="name">{{tag.name}}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+               </div>
+               <div id="title-container">
+                   <h1 id="article-title">
+                       <a id="article-url" href="{{article.url}}" title="View original" 
+                        style="background: transparent url('https://s2.googleusercontent.com/s2/favicons?domain={{article.site_url}}') 0 center no-repeat;"></a>
+                       {{article.title}}</h1>
+               </div>
             <div id="article-meta-container">
                 <aside id="article-meta">
                {% if article.author or article.published %}
@@ -68,11 +101,6 @@ $(document).ready(function() {
                     <span class="published">{{article.published}}</span>
                 {% endif %}
                 </aside>
-                <ul id="tag-it">
-                    {% for tag in article.tags.all %}
-                        <li>{{tag.name}}</li>
-                    {% endfor %}
-                </ul>
             </div>
             </header> 
             <section id="article-content">

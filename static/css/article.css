@@ -5,11 +5,10 @@ body {
     padding-top: 0px;
 }
 .container {
-    width: 866px; 
+    width: 886px; 
 }
 #article-header {
-    background-color: #f5f5f5;
-    padding: 20px 20px 6px 28px;
+    padding: 8px 20px 6px 28px;
     margin: -20px -20px 20px;
 }
 #article-header h1 {
@@ -48,6 +47,10 @@ body {
     line-height: 150%;
 }
 
+#title-container {
+    margin-top: -5px;
+}
+
 code {
     background: transparent;    
 }
@@ -57,22 +60,26 @@ code {
     border-bottom: 1px solid #DDD;
     padding-bottom: 2px;
 }
-#tag-it {
-    border: none;
-    background: transparent;
-    margin: 6px 0 0 -3px;
+
+.tag-list {
+    margin-top: 10px;
+    padding-top: 3px;
 }
-#tag-it span {
-    cursor: pointer; 
+.tag-list .tag {
+    margin: 0 5px 3px 17px !important;
 }
-.tagit-new {
-    padding: 0.1em 4px .25em 0 !important;
+#tag-input-container {
+    display: inline;
+    float: right;
+    margin-top: -2px;
 }
-.tagit-new input {
-    margin: 0 0 0 3px !important;
-    padding-left: 2px;
+.tag-list .tag .arrow {
+    background-position:-30px 0 !important;
+}
+.tag-list .tag:hover .arrow {
+    background-position:-45px 0 !important;
+}
+.tag-list .tag:hover .arrow:hover {
+    background-position:-60px 0 !important;
 }
 
-.hidden {
-    display: none;
-}
