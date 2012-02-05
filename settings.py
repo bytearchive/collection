@@ -169,6 +169,7 @@ INSTALLED_APPS = [
     # my external
     "taggit",
     "djcelery",
+    "south",
 
     # my project 
     "reader"
