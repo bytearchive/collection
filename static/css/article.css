@@ -83,3 +83,27 @@ code {
     background-position:-60px 0 !important;
 }
 
+.sidebar-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-left: 0 !important;
+}
+.well {
+    padding: 10px 2px 10px 1px;
+    width: 50px;
+}
+.nav-list {
+    padding-left: 7px;
+}
+.nav > li > a:hover {
+  text-decoration: none;
+  background-color: white;
+}
+.nav-list > li > a {
+    padding: 0;
+    margin: 0;
+    height: 36px;
+    width: 36px;
+    border: 1px solid #ccc;
+}

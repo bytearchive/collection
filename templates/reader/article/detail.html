@@ -77,6 +77,11 @@ $(document).ready(function() {
 
 {% block body %}
 <div class="wrapper">
+    <div class="span1 well sidebar-nav">
+        <ul class="nav nav-list">
+            <li><a href="{% url reader:articles %}"><img src="{{ STATIC_URL }}img/home.png"></a></li>
+        </ul>
+    </div>
     <section id="content">
         <article>
             <header id="article-header"> 

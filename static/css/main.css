@@ -8,10 +8,12 @@ body {
     width: 926px; 
 }
 
+.container .alert {
+    margin: 15px auto 5px auto !important;
+}
 .content .span14 {
     min-height: 200px;
 }
-
 .content {
     background-color: #fff;
     padding: 15px 25px 10px 25px;
