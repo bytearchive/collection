@@ -9,7 +9,7 @@ def process_article_task(user_id, url, html):
 
     user = UserProfile.objects.get(pk=user_id)
     article, created = Article.objects.get_or_create(user=user, url=url)
-    content = get_article(html)
+    content = get_article(url, html)
     title, author, published = get_article_meta(html)
     article.title = title
     article.author = author

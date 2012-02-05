@@ -95,6 +95,8 @@ def subscribe(req):
     user = _user(req)
     article, created = Article.objects.get_or_create(user=user, url=url)
     article.html = html
+    article.state = 'UNREAD'
+    article.deleted = False
     article.save()
     process_article_task.delay(user.id, url, html)
     return HttpResponse(simplejson.dumps({"is_saved": True}))

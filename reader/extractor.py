@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from utils import *
 from BeautifulSoup import BeautifulSoup as Soup
 from BeautifulSoup import Tag, NavigableString
 from math import floor
@@ -57,6 +58,8 @@ def _inner_html(soup):
     return html
 
 def _inner_text(elem):
+    if not elem:
+        return ''
     if is_navigable_string(elem):
         return elem.__str__()
     return ''.join(elem.findAll(text = True))
@@ -121,9 +124,11 @@ class ArticleCleaner(object):
     """
     clean the extracted article element
     """
-    def __init__(self, article):
+    def __init__(self, article, url):
         super(ArticleCleaner, self).__init__()
         self.article = article
+        self.url = url
+        self.domain = url_to_domain(url)
     
     def _remove_attribute(self, attr_name = 'style'):
         elems = self.article.findAll(lambda x: _has_attr(x, attr_name)) 
@@ -196,8 +201,16 @@ class ArticleCleaner(object):
             if img_embded_obj_count == 0 and len(text) == 0:
                 p.extract()
 
+    def make_img_src_absolute(self):
+        imgs = self.article.findAll('img')
+        for img in imgs:
+            src = _attr(img, 'src')
+            if src[:1] == '/':
+                img['src'] = "http://" + self.domain + src
+
     def clean(self):
         """ clean article inline style for display """
+
         self._remove_attribute()
 
         html = ArticleCleaner._remove_dup_breaks(self.article.__str__())
@@ -217,6 +230,8 @@ class ArticleCleaner(object):
         fishy_elems = ['table', 'ul', 'div']
         self._remove_elem_conditionally(fishy_elems)
         self._remove_empty_paragraph()
+
+        self.make_img_src_absolute()
         return self.article
 
 class ArticleExtractor(object):
@@ -414,9 +429,9 @@ def get_article_meta(html):
     published = meta.get_published()
     return title, author, published 
 
-def get_article(html):
+def get_article(url, html):
     article = ArticleExtractor(html).extract()
-    article = ArticleCleaner(article).clean()
+    article = ArticleCleaner(article, url).clean()
     article = ArticleStyler(article).style()
     return article.__str__()
 

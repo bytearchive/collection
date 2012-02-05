@@ -1,4 +1,4 @@
-import urllib2
+from utils import *
 import re
 from django.db import models
 from django.contrib.auth.models import User
@@ -48,13 +48,13 @@ class Article(DateSupportModel):
     def _get_summary(self): 
         text = _inner_text(Soup(self.content))
         text_len = 120
-        if re.search('[a-zA-Z]', text[:5]):
+        if re.search('[a-zA-Z]', text[20:50]):
             text_len = 240
         return text[:text_len] + "..."
     summary = property(_get_summary)
 
     def _get_site_url(self):
-        return urllib2.Request(self.url).get_host()
+        return url_to_domain(self.url)
     site_url = property(_get_site_url) 
 
     def _get_url_summary(self):
