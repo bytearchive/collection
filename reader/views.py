@@ -7,11 +7,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.views.generic import ListView, DetailView
 from django.utils import simplejson
-
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 logger = logging.getLogger(__name__)
 
-# help functions
 def _user(request):
     return request.user.get_profile()
 
@@ -23,6 +23,10 @@ class ArticleDetailView(DetailView):
 class ArticleListView(ListView):
     context_object_name = 'article_list'
     template_name = "reader/article/list.html"
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ArticleListView, self).dispatch(*args, **kwargs)
 
     def get_queryset(self):
         user = _user(self.request)
@@ -101,7 +105,6 @@ def subscribe(req):
     process_article_task.delay(user.id, url, html)
     return HttpResponse(simplejson.dumps({"is_saved": True}))
 
-# /article/reload
 def reload(request):
     user = _user(request)
     a = Article.objects.get(pk=request.POST['article_id'])

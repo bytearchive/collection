@@ -5,12 +5,11 @@ body {
     padding-top: 30px;
 }
 .container {
-    width: 920px; 
+    width: 926px; 
 }
 
 .content .span14 {
     min-height: 200px;
-    width: 920px;
 }
 
 .content {
