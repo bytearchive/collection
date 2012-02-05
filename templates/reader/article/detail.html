@@ -19,6 +19,7 @@
 $(document).ready(function() { 
     prettyPrint();
 
+
     var remove_tag = function($item) {
         $item.detach();
         var name = $item.find('.name').text();
@@ -39,6 +40,7 @@ $(document).ready(function() {
             remove_tag(item);
         });
 
+
         var id = $('#article_id').text();
         $.post('/reader/article/tag/', {
                 "tag_name": name,
@@ -49,19 +51,23 @@ $(document).ready(function() {
             });
     };
 
-    $("input[name=tag-input]").keydown(function(evt) {
-        if (evt.keyCode == 13) {
-            var tag = $(this).val();
-            if (!tag)
-                return ;
-            $(this).val("");
-            add_tag(tag);
-        }
-    });
-
     $("#article-header .arrow").click(function() {
         var tag = $(this).parent();
         remove_tag(tag);
+    });
+
+    var tag_url = "/reader/tag/autocomplete" 
+    $.get(tag_url, function(data) {
+        var tags = JSON.parse(data)['tags'];
+        $('#tag-input').typeahead({source: tags}).keyup(function(evt) {
+            if (evt.keyCode == 13) {
+                var tag = $(this).val();
+                $('#tag-input').val("");
+                if (!tag)
+                    return ;
+                add_tag(tag);
+            }
+        });
     });
 
 });
@@ -76,7 +82,7 @@ $(document).ready(function() {
             <header id="article-header"> 
                <div class="tag-list">
                 <div id="tag-input-container">
-                    <input type="text" class="span2" name="tag-input" value="" placeholder="add tag">
+                    <input type="text" id="tag-input" class="span2" name="tag-input" value="" placeholder="add tag">
                 </div>
                 {% for tag in article.tags.all %}
                     <div class="tag">

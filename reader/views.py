@@ -9,6 +9,7 @@ from django.views.generic import ListView, DetailView
 from django.utils import simplejson
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from taggit.models import Tag
 
 logger = logging.getLogger(__name__)
 
@@ -159,3 +160,7 @@ def check_existence(request):
         except Exception, e:
             sub = None
     return HttpResponse(simplejson.dumps({"is_saved": is_saved}))
+
+def autocomplete(req):
+    tags = [t.name for t in Tag.objects.all()]
+    return HttpResponse(simplejson.dumps({"tags": tags}))

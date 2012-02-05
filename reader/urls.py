@@ -17,6 +17,8 @@ urlpatterns = patterns('reader.views',
     url(r"^article/check-existence/$", 'check_existence', name='check_existence'),
 
     url(r'^article/search/$', SearchedArticleListView.as_view(), name='search'),
+
+    url(r'^tag/autocomplete/$', 'autocomplete', name='tag_autocomplete'),
 )
 
 
