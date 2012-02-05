@@ -19,14 +19,14 @@
 $(document).ready(function() { 
     prettyPrint();
 
+    var article_id = $('#article_id').text();
 
     var remove_tag = function($item) {
         $item.detach();
         var name = $item.find('.name').text();
-        var id = $('#article_id').text();
         $.post('/reader/article/untag/', {
                 "tag_name": name,
-                "article_id": id
+                "article_id": article_id
             },
             function(data) {
                 console.log('tag: ' + name + ' removed.');
@@ -40,11 +40,9 @@ $(document).ready(function() {
             remove_tag(item);
         });
 
-
-        var id = $('#article_id').text();
         $.post('/reader/article/tag/', {
                 "tag_name": name,
-                "article_id": id
+                "article_id": article_id 
             },
             function(data) {
                 console.log('tag: ' + name + ' added.');
@@ -70,6 +68,26 @@ $(document).ready(function() {
         });
     });
 
+    var unarchive_btn = $('.toolbar-archived');
+    var archived_btn = $('.toolbar-unarchived');
+console.log(archived_btn);
+
+   unarchive_btn.click(function(e) {
+        e.preventDefault();
+        $(this).parent().addClass('hidden');
+        archived_btn.parent().removeClass('hidden');
+        $.post(unarchive_btn.attr('href'), {"article_id": article_id}, function() {
+            console.log("article archived");
+        });
+    });
+    archived_btn.click(function(e) {
+        e.preventDefault();
+        $(this).parent().addClass('hidden');
+        unarchive_btn.parent().removeClass('hidden');
+        $.post(archived_btn.attr('href'), {"article_id": article_id}, function() {
+            console.log("article unarchived");
+        });
+    });
 });
 </script>
 {% endblock %}
@@ -79,7 +97,10 @@ $(document).ready(function() {
 <div class="wrapper">
     <div class="span1 well sidebar-nav">
         <ul class="nav nav-list">
-            <li><a href="{% url reader:articles %}"><img src="{{ STATIC_URL }}img/home.png"></a></li>
+            <li><a href="{% url reader:articles %}" title="go home"></a></li>
+            <li><a class="toolbar-view" href="{{article.url}}" title="view original"></a></li>
+            <li class="{{archived}}"><a class="toolbar-archived" href="{% url reader:unachieve %}" title="unarchive"></a></li>
+            <li class="{{unarchived}}"><a class="toolbar-unarchived" href="{% url reader:achieve %}" title="archive"></a></li>
         </ul>
     </div>
     <section id="content">

@@ -64,6 +64,9 @@ class Article(DateSupportModel):
         return  url
     url_summary = property(_get_url_summary) 
 
+    def is_archived(self):
+        return self.state == 'ACHIEVE'
+
 
 # hook UserProfile with User
 def create_user_profile(sender, instance, created, **kwargs):

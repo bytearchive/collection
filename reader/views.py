@@ -21,6 +21,15 @@ class ArticleDetailView(DetailView):
     template_name = "reader/article/detail.html"
     context_object_name = "article"
 
+    def get_context_data(self, **kwargs):
+        context = super(ArticleDetailView, self).get_context_data(**kwargs)
+      
+        article = context['article']
+        context['archived'] = not article.is_archived() and 'hidden' or ''
+        context['unarchived'] = article.is_archived() and 'hidden' or ''
+        return context
+    
+
 class ArticleListView(ListView):
     context_object_name = 'article_list'
     template_name = "reader/article/list.html"
