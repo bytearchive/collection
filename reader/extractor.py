@@ -211,8 +211,6 @@ class ArticleCleaner(object):
     def clean(self):
         """ clean article inline style for display """
 
-        self._remove_attribute()
-
         html = ArticleCleaner._remove_dup_breaks(self.article.__str__())
         #html = ArticleCleaner._remove_dup_spaces(html)
         html = ArticleCleaner._trim_spaces(html)
@@ -232,6 +230,9 @@ class ArticleCleaner(object):
         self._remove_empty_paragraph()
 
         self.make_img_src_absolute()
+        self._remove_attribute('style')
+        self._remove_attribute('id')
+        self._remove_attribute('class')
         return self.article
 
 class ArticleExtractor(object):
