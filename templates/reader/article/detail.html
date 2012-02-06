@@ -107,9 +107,10 @@ console.log(archived_btn);
         <article>
             <header id="article-header"> 
                <div class="tag-list">
-                <div id="tag-input-container">
-                    <input type="text" id="tag-input" class="span2" name="tag-input" value="" placeholder="add tag">
-                </div>
+                    <div id="tag-input-container" class="input-append">
+                        <input type="text" id="tag-input" class="span2" name="tag-input" value="">
+                        <span class="add-on"><i class="icon-tags"></i></span>
+                    </div>
                 {% for tag in article.tags.all %}
                     <div class="tag">
                         <div class="arrow"></div>

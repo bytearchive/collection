@@ -72,6 +72,10 @@ code {
     display: inline;
     float: right;
     margin-top: -2px;
+    width: 198px;
+}
+#tag-input-container input {
+    width: 153px;
 }
 .tag-list .tag .arrow {
     background-position:-30px 0 !important;
@@ -90,7 +94,7 @@ code {
     margin-left: 0 !important;
 }
 .well {
-    padding: 10px 2px 10px 1px;
+    padding: 10px 5px 10px 1px;
     width: 50px;
 }
 .nav-list {
@@ -122,4 +126,9 @@ code {
 }
 .toolbar-archived {
     background-position: 0 -72px !important;    
+}
+
+/*remove style in bootstrap*/
+code {
+    border: none;
 }

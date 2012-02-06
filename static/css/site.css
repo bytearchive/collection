@@ -1,0 +1,9 @@
+.legal {
+    text-align: center;
+    display: block;
+    overflow: hidden;
+    padding-bottom: 10px;
+}
+#footer {
+    margin-top: 40px;
+}
