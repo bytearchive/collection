@@ -55,13 +55,13 @@ class ArticleListView(ListView):
     def ping_reading(self, context):
         context['UNREAD'] = 'active' 
 
-class AchievedArticleListView(ArticleListView):
+class ArchivedArticleListView(ArticleListView):
     def get_queryset(self):
         user = _user(self.request)
-        return Article.objects.filter(user=user, state='ACHIEVE', deleted=False)
+        return Article.objects.filter(user=user, state='ARCHIVED', deleted=False)
         
     def ping_reading(self, context):
-        context['ACHIEVE'] = 'active' 
+        context['ARCHIVED'] = 'active' 
 
 class SearchedArticleListView(ArticleListView):
 
@@ -134,15 +134,15 @@ def _change_article_state(article_id, change_to='UNREAD'):
     a.state = change_to
     a.save()
 
-def achieve(request):
+def archive(request):
     article_id = request.POST['article_id'];
-    _change_article_state(article_id, 'ACHIEVE')
+    _change_article_state(article_id, 'ARCHIVED')
     return HttpResponseRedirect(reverse('reader:articles'))
 
-def unachieve(request):
+def unarchive(request):
     article_id = request.POST['article_id'];
     _change_article_state(article_id, 'UNREAD')
-    return HttpResponseRedirect(reverse('reader:achieved'))
+    return HttpResponseRedirect(reverse('reader:archived'))
 
 def _tag_changed(request):
     tag = request.POST['tag_name']

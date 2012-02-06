@@ -99,8 +99,8 @@ console.log(archived_btn);
         <ul class="nav nav-list">
             <li><a href="{% url reader:articles %}" title="go home"></a></li>
             <li><a class="toolbar-view" href="{{article.url}}" title="view original"></a></li>
-            <li class="{{archived}}"><a class="toolbar-archived" href="{% url reader:unachieve %}" title="unarchive"></a></li>
-            <li class="{{unarchived}}"><a class="toolbar-unarchived" href="{% url reader:achieve %}" title="archive"></a></li>
+            <li class="{{archived}}"><a class="toolbar-archived" href="{% url reader:unarchive %}" title="unarchive"></a></li>
+            <li class="{{unarchived}}"><a class="toolbar-unarchived" href="{% url reader:archive %}" title="archive"></a></li>
         </ul>
     </div>
     <section id="content">

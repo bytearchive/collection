@@ -29,7 +29,7 @@ class UserProfile(DateSupportModel):
 class Article(DateSupportModel):
     STATES = (
         (u'UNREAD', u'unread'),
-        (u'ACHIEVE', u'achieve')
+        (u'ARCHIVED', u'archived')
     )
     url = models.CharField(max_length=255, unique=True)
     title = models.CharField(max_length=255, default='')
@@ -65,7 +65,7 @@ class Article(DateSupportModel):
     url_summary = property(_get_url_summary) 
 
     def is_archived(self):
-        return self.state == 'ACHIEVE'
+        return self.state == 'ARCHIVED'
 
 
 # hook UserProfile with User

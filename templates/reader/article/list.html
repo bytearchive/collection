@@ -41,7 +41,7 @@ $(document).ready(function() {
         {% if user.is_authenticated %}
         <ul class="nav nav-pills">
             <li class="{{ UNREAD }}"><a href="{% url reader:articles %}">Reading ({{reading_count}})</a></li>
-            <li class="{{ ACHIEVE }}"><a href="{% url reader:achieved %}">Achieve</a></li>
+            <li class="{{ ARCHIVED }}"><a href="{% url reader:archived %}">Archive</a></li>
            {% if RESULT  %}
                <li class="active"> <a href="#" >Result ({{article_list.count}})</a> </li>
            {% endif %}
@@ -67,12 +67,12 @@ $(document).ready(function() {
                             {% csrf_token %}
                             <div class="btn-group hidden">
                                 <a class="btn" href="{% url reader:unsubscribe %}"><i class="icon-trash"></i> Delete</a>
-                               {% if ACHIEVE  %}
-                               <a class="btn" href="{% url reader:unachieve %}"><i class="icon-repeat"></i> Unachieve</a>
+                               {% if ARCHIVED  %}
+                               <a class="btn" href="{% url reader:unarchive %}"><i class="icon-repeat"></i> Unarchive</a>
                                {% endif %}
                                 <a class="btn" href="{% url reader:reload %}"><i class="icon-refresh"></i> Reload</a>
                                {% if UNREAD  %}
-                                <a class="btn" href="{% url reader:achieve %}"><i class="icon-ok"></i> Achieve</a>
+                                <a class="btn" href="{% url reader:archive %}"><i class="icon-ok"></i> Archive</a>
                                {% endif %}
                             </div>
                         </form>
