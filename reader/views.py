@@ -88,12 +88,14 @@ class SearchedArticleListView(ArticleListView):
         user = _user(self.request)
         url, tags, words = self._normalize_query(query)
 
-        q = Q(user=user)
-        if tags:
-            q &= Q(tags__name__in=tags)
+        q = Q(user=user) & Q(deleted=False)
         for word in words:
             q &= Q(title__icontains=word) | Q(content__icontains=word)
-        return Article.objects.filter(q)
+        results = Article.objects.filter(q)
+        for tag in tags:
+            results = results.filter(tags__name__iexact=tag)
+        return results.distinct()
+
        
     def get_context_data(self, **kwargs):
         context = super(SearchedArticleListView, self).get_context_data(**kwargs)

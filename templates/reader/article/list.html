@@ -46,10 +46,9 @@ $(document).ready(function() {
                <li class="active"> <a href="#" >Result ({{article_list.count}})</a> </li>
            {% endif %}
         </ul>
-        <form action="{% url reader:search %}" method="get" class="form-search">
-            {% csrf_token %}
+        <form action="{% url reader:search %}" method="GET" class="form-search">
             <input class="span6 search-query" id="search-input" name="query" size="16" type="search"
-            title="Enter article url" placeholder="search by #tag or keyword"  autofocus="autofocus" value="{{query_text}}">
+            title="Enter article url" placeholder="search by #tag or keyword"  autofocus="autofocus" value="{{query}}">
         </form>
         {% endif %}
     </div>
