@@ -118,7 +118,7 @@ def subscribe(req):
     article.deleted = False
     article.save()
     process_article_task.delay(user.id, url, html)
-    return HttpResponse(simplejson.dumps({"is_saved": True}))
+    return reading_count(req)
 
 def reload(request):
     user = _user(request)
