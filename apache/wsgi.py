@@ -11,6 +11,3 @@ pinax.env.setup_environ(__file__)
 
 # set application for WSGI processing
 application = WSGIHandler()
-
-
-

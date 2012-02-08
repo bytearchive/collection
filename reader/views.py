@@ -16,6 +16,10 @@ logger = logging.getLogger(__name__)
 def _user(request):
     return request.user.get_profile()
 
+def _get_reading_count(user):
+    reading_count = Article.objects.filter(user=user, state='UNREAD', deleted=False).count()
+    return reading_count
+
 class ArticleDetailView(DetailView):
     model = Article
     template_name = "reader/article/detail.html"
@@ -46,8 +50,7 @@ class ArticleListView(ListView):
         user = _user(self.request)
         context = super(ArticleListView, self).get_context_data(**kwargs)
         
-        reading_count = Article.objects.filter(user=user, state='UNREAD', deleted=False).count()
-        context['reading_count'] = reading_count
+        context['reading_count'] = _get_reading_count(user)
 
         self.ping_reading(context)
         return context
@@ -175,3 +178,8 @@ def check_existence(request):
 def autocomplete(req):
     tags = [t.name for t in Tag.objects.all()]
     return HttpResponse(simplejson.dumps({"tags": tags}))
+
+def reading_count(req):
+    user = _user(req)
+    reading = _get_reading_count(user)
+    return HttpResponse(simplejson.dumps({"reading_count": reading}))
