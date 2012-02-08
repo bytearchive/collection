@@ -17,3 +17,5 @@ fixtures/initial_data.json
 
 # common task
 scripts/*
+
+site_media/*
