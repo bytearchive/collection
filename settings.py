@@ -209,8 +209,12 @@ DEBUG_TOOLBAR_CONFIG = {
 # define the output of get_profile()
 AUTH_PROFILE_MODULE = 'reader.UserProfile'
 
-
-
+# celery setting for broker
+BROKER_HOST = "localhost"
+BROKER_PORT = 5672
+BROKER_USER = "guest"
+BROKER_PASSWORD = "guest"
+BROKER_VHOST = "/"
 
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.
