@@ -17,8 +17,8 @@ urlpatterns = patterns('reader.views',
     url(r'^tag/autocomplete/$', 'autocomplete', name='tag_autocomplete'),
 
     url(r"^ajax/article/subscribe/$", 'subscribe', name='subscribe'),
-    url(r"^ajax/article/check-existence/$", 'check_existence', name='check_existence'),
-
+    url(r"^ajax/article/check-existence/$", 'check_existence'),
+    url(r"^ajax/article/reading-count/$", 'reading_count'),
 )
 
 
