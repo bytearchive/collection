@@ -70,9 +70,9 @@ $(document).ready(function() {
 
     var unarchive_btn = $('.toolbar-archived');
     var archived_btn = $('.toolbar-unarchived');
-console.log(archived_btn);
+    console.log(archived_btn);
 
-   unarchive_btn.click(function(e) {
+    unarchive_btn.click(function(e) {
         e.preventDefault();
         $(this).parent().addClass('hidden');
         archived_btn.parent().removeClass('hidden');
@@ -94,15 +94,18 @@ console.log(archived_btn);
 
 
 {% block body %}
+<div class="span1 well sidebar-nav">
+    <ul class="nav nav-list">
+        <li><a href="{% url reader:articles %}" title="go home"></a></li>
+        <li><a class="toolbar-view" href="{{article.url}}" title="view original"></a></li>
+        <li class="{{archived}}"><a class="toolbar-archived" href="{% url reader:unarchive %}" title="unarchive"></a></li>
+        <li class="{{unarchived}}"><a class="toolbar-unarchived" href="{% url reader:archive %}" title="archive"></a></li>
+        {% if request.user.is_superuser %}
+        <li><a class="toolbar-debug" href="{% url reader:article_debug article.id %}" title="debug"></a></li>
+        {% endif %}
+    </ul>
+</div>
 <div class="wrapper">
-    <div class="span1 well sidebar-nav">
-        <ul class="nav nav-list">
-            <li><a href="{% url reader:articles %}" title="go home"></a></li>
-            <li><a class="toolbar-view" href="{{article.url}}" title="view original"></a></li>
-            <li class="{{archived}}"><a class="toolbar-archived" href="{% url reader:unarchive %}" title="unarchive"></a></li>
-            <li class="{{unarchived}}"><a class="toolbar-unarchived" href="{% url reader:archive %}" title="archive"></a></li>
-        </ul>
-    </div>
     <section id="content">
         <article>
             <header id="article-header"> 

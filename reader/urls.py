@@ -6,6 +6,7 @@ urlpatterns = patterns('reader.views',
     url(r"^articles/archived/$", ArchivedArticleListView.as_view(), name='archived'),
     url(r'^article/search/$', SearchedArticleListView.as_view(), name='search'),
     url(r'^article/detail/(?P<pk>\d+)/$', ArticleDetailView.as_view(), name='article_detail'),
+    url(r'^article/debug/(?P<pk>\d+)/$', ArticleDebugView.as_view(), name='article_debug'),
 
     url(r'^article/unsubscribe/$', 'unsubscribe', name='unsubscribe'),
     url(r'^article/archive/$', 'archive', name='archive'),

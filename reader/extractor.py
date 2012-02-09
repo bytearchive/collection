@@ -83,7 +83,6 @@ def get_link_density(elem):
     return text_total > 0 and float(links_text_total) / text_total or 0.0
 
 class Readability(object):
-  
     @staticmethod
     def _is_negative_for_article(s):
         return re.search(PATTERNS['NEGATIVE'], s)
@@ -235,6 +234,7 @@ class ArticleCleaner(object):
         self._remove_attribute('class')
         return self.article
 
+
 class ArticleExtractor(object):
     """extract article elements from HTML"""
     def __init__(self, html):
@@ -361,6 +361,17 @@ class ArticleExtractor(object):
             self.merge_related_elems()
         return self.article
 
+class ArticleDebugProcessor(ArticleExtractor):
+    """using Readability class to calc the score of each element in html"""
+
+    def __init__(self, html):
+        super(ArticleDebugProcessor, self).__init__(html)
+        self.html= html
+
+    def process(self):
+        self.compute_readability_score() 
+        return self.doc.__str__();
+
 class ArticleStyler(object):
     """put css class to elems"""
     def __init__(self, article):
@@ -436,6 +447,9 @@ def get_article(url, html):
     article = ArticleStyler(article).style()
     return article.__str__()
 
+def render_debug_html(article):
+    html = ArticleDebugProcessor(article.html).process()
+    return html
 
 if __name__ == '__main__':
     extract()

@@ -127,6 +127,10 @@ code {
 .toolbar-archived {
     background-position: 0 -72px !important;    
 }
+.toolbar-debug {
+    background-position: 0 -108px !important;    
+}
+
 
 /*remove style in bootstrap*/
 code {

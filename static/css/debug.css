@@ -1,0 +1,12 @@
+.candidate-div {
+    border: 2px dashed #3399FF;
+}
+
+#score-board {
+    float: right;
+    border: 1px solid black;
+    display: inline;
+    background: white;
+    color: black;
+    padding: 2px 7px 2px 2px;
+}

@@ -10,6 +10,7 @@ from django.utils import simplejson
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from taggit.models import Tag
+from extractor import render_debug_html
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,17 @@ class ArticleDetailView(DetailView):
         context['archived'] = not article.is_archived() and 'hidden' or ''
         context['unarchived'] = article.is_archived() and 'hidden' or ''
         return context
-    
+
+class ArticleDebugView(DetailView):
+    model = Article
+    template_name = "reader/article/debug.html"
+    context_object_name = "article"
+
+    def get_context_data(self, **kwargs):
+        context = super(ArticleDebugView, self).get_context_data(**kwargs)
+        article = context['article']
+        context['debug_html'] = render_debug_html(article)
+        return context
 
 class ArticleListView(ListView):
     context_object_name = 'article_list'
@@ -185,3 +196,4 @@ def reading_count(req):
     user = _user(req)
     reading = _get_reading_count(user)
     return HttpResponse(simplejson.dumps({"reading_count": reading}))
+

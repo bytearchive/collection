@@ -1,0 +1,27 @@
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/debug.css">
+{% block body %}
+{{ debug_html|safe }}
+{% endblock %}
+<script src="{{ STATIC_URL }}js/jquery.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function() { 
+    var candidate = null;
+    var readability = -1;
+    $('[readability]').each(function(index, elem) {
+        var $elem = $(elem);
+        var score = parseInt($elem.attr('readability'));
+        if (score > readability) {
+            readability = score;
+            candidate = $elem; 
+        }
+        console.log("" + score + " " + readability);
+    });
+
+    if (candidate) {
+        candidate.addClass('candidate-div');
+        var score_board = $('<div id="score-board">' + readability + '</div>');
+        candidate.prepend(score_board);
+    }
+});
+</script>
