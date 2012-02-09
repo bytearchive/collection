@@ -111,11 +111,13 @@ class SearchedArticleListView(ArticleListView):
 def subscribe(req):
     html = req.POST['html']
     url = req.POST['url']
+    tags = simplejson.loads(req.POST['tags'])
     user = _user(req)
     article, created = Article.objects.get_or_create(user=user, url=url)
     article.html = html
     article.state = 'UNREAD'
     article.deleted = False
+    article.tags.add(*tags);
     article.save()
     process_article_task.delay(user.id, url, html)
     return reading_count(req)
