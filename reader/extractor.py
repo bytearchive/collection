@@ -417,11 +417,7 @@ class ArticleMetaExtractor(object):
         return pub
 
     def get_title(self):
-        title = self.doc.find('h1')
-        h2s = self.doc.findAll('h2')
-
-        if title is None and len(h2s) == 1:
-            title = h2s[0]
+        title = self.doc.find('title')
         if title is None:
             return '';
         text = _inner_text(title)
