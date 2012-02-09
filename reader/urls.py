@@ -11,9 +11,9 @@ urlpatterns = patterns('reader.views',
     url(r'^article/archive/$', 'archive', name='archive'),
     url(r"^article/unarchive/$", 'unarchive', name='unarchive'),
     url(r"^article/reload/$", 'reload', name='reload'),
+
     url(r"^article/tag/$", 'add_tag'),
     url(r"^article/untag/$", 'remove_tag'),
-
     url(r'^tag/autocomplete/$', 'autocomplete', name='tag_autocomplete'),
 
     url(r"^ajax/article/subscribe/$", 'subscribe', name='subscribe'),

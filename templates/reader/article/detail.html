@@ -24,7 +24,7 @@ $(document).ready(function() {
     var remove_tag = function($item) {
         $item.detach();
         var name = $item.find('.name').text();
-        $.post('/reader/article/untag/', {
+        $.post('/article/untag/', {
                 "tag_name": name,
                 "article_id": article_id
             },
@@ -40,7 +40,7 @@ $(document).ready(function() {
             remove_tag(item);
         });
 
-        $.post('/reader/article/tag/', {
+        $.post('/article/tag/', {
                 "tag_name": name,
                 "article_id": article_id 
             },
@@ -54,7 +54,7 @@ $(document).ready(function() {
         remove_tag(tag);
     });
 
-    var tag_url = "/reader/tag/autocomplete" 
+    var tag_url = "/tag/autocomplete" 
     $.get(tag_url, function(data) {
         var tags = JSON.parse(data)['tags'];
         $('#tag-input').typeahead({source: tags}).keyup(function(evt) {
