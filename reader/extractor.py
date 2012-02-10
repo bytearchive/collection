@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from utils import *
 from BeautifulSoup import BeautifulSoup as Soup
-from BeautifulSoup import Tag, NavigableString
+from BeautifulSoup import Tag, NavigableString, Comment
 from math import floor
 import re
    
@@ -255,9 +255,16 @@ class ArticleExtractor(object):
         return not re.search(PATTERNS["BLOCK_ELEMENT"], s)
 
     def remove_unlikely(self, remove=True):
-        """remove unlikely elems and replace DIV with P if no block elem within"""
+        """ remove unlikely elems and html comment (which you can't see it) 
+            and replace DIV with P if no block elem within"""
+        [elem.extract() for elem in self.doc.findAll(text=lambda x:isinstance(x, Comment))]
         elems = [elem for elem in non_string_elements(self.doc)]
         for elem in elems:
+            if isinstance(elem, Comment):
+                _debug('remove comment ')
+                elem.extract()
+                continue
+
             if remove:
                 id_and_class = _attr(elem, 'id') + "#" + _attr(elem, 'class')
                 if elem.name != 'body' and ArticleExtractor._is_unlikely_candidate(id_and_class):
@@ -271,6 +278,7 @@ class ArticleExtractor(object):
                 for i, tag in enumerate(elem.contents):
                     p.insert(i, tag)
                 elem.replaceWith(p)
+
 
     def init_readability(self, elem):
         readability = Readability.by_name(elem)
