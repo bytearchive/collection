@@ -189,7 +189,8 @@ def check_existence(request):
     return HttpResponse(simplejson.dumps({"is_saved": is_saved}))
 
 def autocomplete(req):
-    tags = [t.name for t in Tag.objects.all()]
+    user = _user(req)
+    tags = [t.name for t in Tag.objects.filter(article__user=user)]
     return HttpResponse(simplejson.dumps({"tags": tags}))
 
 def reading_count(req):
