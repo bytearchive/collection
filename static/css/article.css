@@ -34,30 +34,19 @@ body {
 #article-content {
     min-height: 500px;
     padding-top: 0;
-    font-family: Georgia,"Times New Roman",serif;
     padding: 0 10px;
-}
-#article-content p {
-    font-size: 1.3em;
-    line-height: 1.55em;
-    margin: 0.8em 0;
-}
-#article-content li {
-    font-size: 1.3em;
-    line-height: 150%;
 }
 
 #title-container {
     margin-top: -5px;
 }
-
-code {
-    background: transparent;    
+#article-meta-container {
+    border-bottom: 1px solid #DDD;
+    margin-right: 15px;
 }
 #article-meta {
-    margin: -2px 0 0 2px;
+    margin: -2px 0 0 20px;
     font-size: 0.9em;
-    border-bottom: 1px solid #DDD;
     padding-bottom: 2px;
 }
 
@@ -73,6 +62,9 @@ code {
     float: right;
     margin-top: -2px;
     width: 198px;
+}
+#tag-input-container .input-append {
+    margin-bottom: 0px !important;
 }
 #tag-input-container input {
     width: 153px;
@@ -135,4 +127,43 @@ code {
 /*remove style in bootstrap*/
 code {
     border: none;
+    background: transparent;    
 }
+
+
+/*article content style*/
+#article-content p, 
+#article-content li, 
+#article-content h1, 
+#article-content h2, 
+#article-content h3, 
+#article-content h4, 
+#article-content h5 {
+    font-family: Georgia,"Helvetica Neue", Helvetica, Arial, "Times New Roman",serif;
+    line-height: 1.55em !important;
+}
+#article-content p {
+    font-size: 1.25em;
+    margin: 0.8em 0;
+}
+#article-content li {
+    line-height: 150%;
+    font-size: 1.2em !important;
+}
+#article-content pre.prettyprint {
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace !important;
+    margin: 1em 2em;
+    font-size: 1.1em !important;
+    line-height: 120%;
+    letter-spacing: 0.015em;
+    padding: 0.5em;
+    border: 1px solid #CCC;
+    background-color: #EEE;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+
+    overflow: auto;
+    overflow-y: hidden;
+}
+
