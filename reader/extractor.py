@@ -123,11 +123,11 @@ class ArticleCleaner(object):
     """
     clean the extracted article element
     """
-    def __init__(self, article, url):
+    def __init__(self, article, url=""):
         super(ArticleCleaner, self).__init__()
         self.article = article
         self.url = url
-        self.domain = url_to_domain(url)
+        self.domain = url and url_to_domain(url) or ""
     
     def _remove_attribute(self, attr_name = 'style'):
         elems = self.article.findAll(lambda x: _has_attr(x, attr_name)) 
@@ -207,6 +207,20 @@ class ArticleCleaner(object):
             if src[:1] == '/':
                 img['src'] = "http://" + self.domain + src
 
+    def replace_code_with_pre(self):
+        """ use only pre tag to decrate code: first replace code with pre, and remove reducdent pre """
+        codes = self.article.findAll('code')
+        for code in codes:
+            code.name = 'pre'
+        pres = self.article.findAll('pre')
+        for pre in pres:
+            if pre.parent and pre.parent.name == 'pre':
+                parent = pre.parent
+                for child in pre.contents:
+                    index = len(parent.contents)
+                    parent.insert(index, child)
+                pre.extract()
+
     def clean(self):
         """ clean article inline style for display """
 
@@ -229,11 +243,11 @@ class ArticleCleaner(object):
         self._remove_empty_paragraph()
 
         self.make_img_src_absolute()
+        self.replace_code_with_pre()
         self._remove_attribute('style')
         self._remove_attribute('id')
         self._remove_attribute('class')
         return self.article
-
 
 class ArticleExtractor(object):
     """extract article elements from HTML"""

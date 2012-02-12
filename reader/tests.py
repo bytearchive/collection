@@ -107,6 +107,11 @@ class ArticleCleanerTest(TestCase):
         ac._remove_empty_paragraph()
         self.assertEqual(0, len(self.soup.findAll('p')))
 
+    def test_replace_code_with_pre(self):
+        self.soup = Soup('<pre class=" prettyprint"><code class=" prettyprint"><span class="pln"><span class="pln">$ git push mathnet </span></span><span class="pun"><span class="pun">-</span></span><span class="pln"><span class="pln">f</span></span></code></pre>')
+        ac = ArticleCleaner(self.soup).replace_code_with_pre()
+        self.assertEqual(1, len(self.soup.findAll('pre')))
+        self.assertEqual(4, len(self.soup.findAll('span')))
 
 class ArticleExtractorTest(TestCase):
     
@@ -157,6 +162,10 @@ class BeautifulSoupTest(TestCase):
         div = Tag(self.soup, 'div')
         self.assertEqual('<div></div>', div.__str__())
 
+    def test_create_new_soup(self):
+        so = Soup('<div></div>')
+        self.assertEqual(1, len(so.contents))
+
     def test_insert_new_content(self):
         """ IMPORTANT: this is how to replace a element in BeautifulSoup """
         text = '<p>AA<b>one</b></p><p>BB</p>'
@@ -178,10 +187,9 @@ class BeautifulSoupTest(TestCase):
             p_without_class = self.soup.html.body.contents[1]
             self.assertEqual('para', p_without_class['class'])
 
-    def test_create_new_soup(self):
-        so = Soup('<div></div>')
-        self.assertEqual(1, len(so.contents))
-
-        
-
+    def test_change_tag_name(self):
+        """way to change tag"""
+        so = Soup('<code></code>')
+        so.code.name = 'pre'
+        self.assertEqual('pre', so.pre.name)
 
