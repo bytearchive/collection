@@ -226,6 +226,7 @@ class ArticleCleaner(object):
 
         #html = ArticleCleaner._remove_dup_breaks(self.article.__str__())
         #html = ArticleCleaner._remove_dup_spaces(html)
+        html = self.article.__str__()
         html = ArticleCleaner._trim_spaces(html)
 
         self.article = Soup(html)

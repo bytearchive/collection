@@ -1,6 +1,7 @@
 from celery.decorators import task
 from reader.models import Article, UserProfile
 from reader.extractor import get_article, get_article_meta
+import traceback
 
 @task(ignore_result=True)
 def process_article_task(user_id, url, html):
