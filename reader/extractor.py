@@ -224,7 +224,7 @@ class ArticleCleaner(object):
     def clean(self):
         """ clean article inline style for display """
 
-        html = ArticleCleaner._remove_dup_breaks(self.article.__str__())
+        #html = ArticleCleaner._remove_dup_breaks(self.article.__str__())
         #html = ArticleCleaner._remove_dup_spaces(html)
         html = ArticleCleaner._trim_spaces(html)
 
@@ -238,8 +238,9 @@ class ArticleCleaner(object):
         #if len(self.article.findAll('h2')) == 1:
             #self._remove_elem('h2')
         
-        fishy_elems = ['table', 'ul', 'div']
-        self._remove_elem_conditionally(fishy_elems)
+        # since this method remove too much content, I shall just turn it off for now
+        #fishy_elems = ['table', 'ul', 'div']
+        #self._remove_elem_conditionally(fishy_elems)
         self._remove_empty_paragraph()
 
         self.make_img_src_absolute()

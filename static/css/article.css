@@ -143,12 +143,12 @@ code {
     line-height: 1.55em !important;
 }
 #article-content p {
-    font-size: 1.25em;
+    font-size: 16px;
     margin: 0.8em 0;
 }
-#article-content li {
+#article-content ul {
     line-height: 150%;
-    font-size: 1.2em !important;
+    font-size: 16px !important;
 }
 #article-content pre.prettyprint {
     font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace !important;
