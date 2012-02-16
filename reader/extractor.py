@@ -441,10 +441,26 @@ class ArticleMetaExtractor(object):
         return pub
 
     def get_title(self):
-        title = self.doc.find('title')
-        if title is None:
-            return '';
-        text = _inner_text(title)
+        headings = self.doc.findAll('h1')
+        headings += self.doc.findAll('h2')
+        
+        text = ''
+        print headings
+        for h in headings:
+            class_txt = _attr(h, 'class')
+            id_txt = _attr(h, 'id')
+            if class_txt.find('title') != -1 or id_txt.find('title') != -1:
+                text = _inner_text(h)
+                break
+        
+        if not text:
+            title = self.doc.find('title')
+            text = _inner_text(title)
+            if re.search(r' [\|\-] ', text):
+                text = re.search(r'(.*)[\|\-] .*', text).group(1)  # 0 for the entire match
+            elif re.search(r': ', text):
+                text = re.search(r'.*:(.*)', text).group(1)
+
         text = ArticleCleaner._remove_dup_spaces(text)
         text = ArticleCleaner._trim_spaces(text)
         _debug('title:', text)
