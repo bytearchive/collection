@@ -130,15 +130,6 @@ $(document).ready(function() {
                         style="background: transparent url('https://s2.googleusercontent.com/s2/favicons?domain={{article.site_url}}') 0 center no-repeat;"></a>
                        {{article.title}}</h1>
                </div>
-            <div id="article-meta-container">
-                <aside id="article-meta">
-               {% if article.author or article.published %}
-                    <span class="author">{{article.author}}</span>
-                    <span> - </span>
-                    <span class="published">{{article.published}}</span>
-                {% endif %}
-                </aside>
-            </div>
             </header> 
             <section id="article-content">
                 {{ article.content|safe }}

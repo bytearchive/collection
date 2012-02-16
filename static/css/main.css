@@ -67,9 +67,6 @@ body {
     line-height: 1em;
     padding: 5px 0 0 2px;
 }
-.article-item-container .article-meta {
-    font-size: 0.9em;
-}
 
 .article-actions-list .tag-list {
     float: left;

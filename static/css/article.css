@@ -39,15 +39,7 @@ body {
 
 #title-container {
     margin-top: -5px;
-}
-#article-meta-container {
     border-bottom: 1px solid #DDD;
-    margin-right: 15px;
-}
-#article-meta {
-    margin: -2px 0 0 20px;
-    font-size: 0.9em;
-    padding-bottom: 2px;
 }
 
 .tag-list {

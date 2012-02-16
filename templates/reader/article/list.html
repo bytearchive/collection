@@ -79,13 +79,6 @@ $(document).ready(function() {
 
                           <h3><a href="{{ a.url }}"><img src="//s2.googleusercontent.com/s2/favicons?domain={{a.site_url}}" title="view original from {{a.site_url}}"></img></a>
                               <a href="{% url reader:article_detail a.id %}">{{a.title}}</a> </h3>
-                           {% if a.author or a.published %}
-                            <aside class="article-meta">
-                                <span class="author">{{a.author}}</span>
-                                <span> - </span>
-                                <span class="published">{{a.published}}</span>
-                            </aside>
-                           {% endif %}
                           <p>{{a.summary}}</p>
                        </div>
                        <div class="tag-list">
