@@ -168,7 +168,7 @@ INSTALLED_APPS = [
 
     # my external
     "taggit",
-    "djcelery",
+    #"djcelery",
     "south",
 
     # my project 
@@ -210,11 +210,11 @@ DEBUG_TOOLBAR_CONFIG = {
 AUTH_PROFILE_MODULE = 'reader.UserProfile'
 
 # celery setting for broker
-BROKER_HOST = "localhost"
-BROKER_PORT = 5672
-BROKER_USER = "guest"
-BROKER_PASSWORD = "guest"
-BROKER_VHOST = "/"
+#BROKER_HOST = "localhost"
+#BROKER_PORT = 5672
+#BROKER_USER = "guest"
+#BROKER_PASSWORD = "guest"
+#BROKER_VHOST = "/"
 
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.

@@ -130,13 +130,13 @@ def subscribe(req):
     article.deleted = False
     article.tags.add(*tags);
     article.save()
-    process_article_task.delay(user.id, url, html)
+    process_article_task(user.id, url, html)
     return reading_count(req)
 
 def reload(request):
     user = _user(request)
     a = Article.objects.get(pk=request.POST['article_id'])
-    process_article_task.delay(user.id, a.url, a.html)
+    process_article_task(user.id, a.url, a.html)
     return HttpResponseRedirect(reverse('reader:articles'))
 
 def unsubscribe(request):
