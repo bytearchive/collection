@@ -205,8 +205,14 @@ class ArticleCleaner(object):
         imgs = self.article.findAll('img')
         for img in imgs:
             src = _attr(img, 'src')
+            if re.search('^http', src):
+                continue
             if src[:1] == '/':
                 img['src'] = "http://" + self.domain + src
+            else:   # relative path
+                rindex = self.url.rfind('/')
+                if rindex != -1:
+                    img['src'] = self.url[:rindex + 1] + src
 
     def replace_code_with_pre(self):
         """ use only pre tag to decrate code: first replace code with pre, and remove reducdent pre """
