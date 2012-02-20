@@ -377,7 +377,12 @@ class ArticleExtractor(object):
                 index += 1
         self.article = article
 
+    def pre_clean(self):
+        """ remove script """
+        [s.extract() for s in self.doc.findAll('script')]
+
     def extract(self, remove=True):
+        self.pre_clean()
         self.remove_unlikely(remove)
         self.compute_readability_score()
         self.find_candidate()
