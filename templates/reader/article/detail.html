@@ -71,7 +71,6 @@ $(document).ready(function() {
 
     var unarchive_btn = $('.toolbar-archived');
     var archived_btn = $('.toolbar-unarchived');
-    console.log(archived_btn);
 
     unarchive_btn.click(function(e) {
         e.preventDefault();
@@ -89,6 +88,19 @@ $(document).ready(function() {
             console.log("article unarchived");
         });
     });
+
+
+    var reload_btn = $('.toolbar-reload');
+    if (reload_btn) {
+        reload_btn.click(function(evt) {
+            evt.preventDefault();
+            $.post(reload_btn.attr('href'), {"article_id": article_id}, function() {
+                console.log("article reload");
+                document.location.reload();
+            });
+        });
+    } 
+
 });
 </script>
 {% endblock %}
@@ -102,6 +114,7 @@ $(document).ready(function() {
         <li class="{{archived}}"><a class="toolbar-archived" href="{% url reader:unarchive %}" title="unarchive"></a></li>
         <li class="{{unarchived}}"><a class="toolbar-unarchived" href="{% url reader:archive %}" title="archive"></a></li>
         {% if request.user.is_superuser %}
+        <li><a class="toolbar-reload" href="{% url reader:reload %}" title="reload"></a></li>
         <li><a class="toolbar-debug" href="{% url reader:article_debug article.id %}" title="debug"></a></li>
         {% endif %}
     </ul>

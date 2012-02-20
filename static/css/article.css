@@ -114,6 +114,9 @@ body {
 .toolbar-debug {
     background-position: 0 -108px !important;    
 }
+.toolbar-reload {
+    background-position: 1px -143px !important;    
+}
 
 
 /*remove style in bootstrap*/
