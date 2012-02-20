@@ -307,6 +307,7 @@ class ArticleExtractor(object):
     def compute_readability_score(self):
         """ compute readability score basded on P elem """
         paragraphs = self.doc.findAll('p')
+        paragraphs += self.doc.findAll('pre')
         self.candidates = []
         for p in paragraphs:
             text = _inner_text(p)
@@ -347,7 +348,7 @@ class ArticleExtractor(object):
 
         # use body if top_candidate not found
         if top_candidate is None:
-            top_candidate = self.doc.html.body
+            top_candidate = self.doc.find('body')
             self.init_readability(top_candidate)
         self.top_candidate = top_candidate
 
