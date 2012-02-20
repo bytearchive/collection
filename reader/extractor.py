@@ -4,8 +4,9 @@ from BeautifulSoup import BeautifulSoup as Soup
 from BeautifulSoup import Tag, NavigableString, Comment
 from math import floor
 import re
-   
-DEBUG = True 
+from django.conf import settings
+
+DEBUG = settings.DEBUG
 READABILITY = "readability"
 
 # let re module to cache the used re
