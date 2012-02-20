@@ -125,27 +125,33 @@ code {
 
 /*article content style*/
 #article-content p, 
-#article-content li, 
+#article-content ul,
+#article-content ol,
+#article-content dl,
 #article-content h1, 
 #article-content h2, 
 #article-content h3, 
 #article-content h4, 
 #article-content h5 {
-    font-family: Georgia,"Helvetica Neue", Helvetica, Arial, "Times New Roman",serif;
-    line-height: 1.55em !important;
+    font-family: Georgia,"Helvetica Neue", Helvetica, Arial, "Times New Roman", sans-serif;
+    line-height: 1.55em;
 }
 #article-content p {
     font-size: 16px;
     margin: 0.8em 0;
 }
-#article-content ul {
-    line-height: 150%;
+#article-content ul,
+#article-content dl,
+#article-content dt,
+#article-content li,
+#article-content ol {
+    line-height: 150% !important;
     font-size: 16px !important;
 }
 #article-content pre.prettyprint {
     font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace !important;
     margin: 1em 2em;
-    font-size: 1.1em !important;
+    font-size: 14px !important;
     line-height: 120%;
     letter-spacing: 0.015em;
     padding: 0.5em;

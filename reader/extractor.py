@@ -239,7 +239,7 @@ class ArticleCleaner(object):
         self.article = Soup(html)
 
         # elem that considered as junk
-        junk_elems = ['form', 'object', 'h1', 'iframe']
+        junk_elems = ['form', 'object', 'iframe']
         self._remove_elem(junk_elems)
 
          #only one h2 was considered as misuse h1 as title, so remove it
